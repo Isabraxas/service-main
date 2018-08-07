@@ -106,8 +106,12 @@
 	<repositories>
 		<repository>
 			<id>central</id>
+            <!--
 			<name>minipc2-releases</name>
 			<url>http://minipc2:8081/artifactory/libs-release</url>
+			-->
+            <name>desarrollo-releases</name>
+            <url>http://desarrollo.viridian.cc:8081/artifactory/libs-release</url>
 		</repository>
 
 	</repositories>
