@@ -26,7 +26,7 @@ public class StatementMainRepository {
         this.mainServerRuntime = mainServerRuntime;
     }
 
-    public String registerNewAccount(RegisterAccountPost body) {
+    public StatementMain registerNewAccount(RegisterAccountPost body) {
         ObjectContext context = mainServerRuntime.newContext();
         StatementMain statementMain = context.newObject(StatementMain.class);
 
@@ -49,7 +49,7 @@ public class StatementMainRepository {
 
         context.commitChanges();
 
-        return body.getAccount();
+        return statementMain;
 
     }
 
