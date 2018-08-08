@@ -12,7 +12,7 @@ spring:
 
 topic:
   statement:
-    jobs: jobs1
+    jobs: jobs2
 
 
 database:

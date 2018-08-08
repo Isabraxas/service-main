@@ -63,7 +63,7 @@ public class StatementJobRepository {
         return result.get(0);
     }
 
-    public SavedStatementJob registerSingleJob(RegisterJobPost body) {
+    public StatementJob registerSingleJob(RegisterJobPost body) {
 
         //save in database
         ObjectContext context = mainServerRuntime.newContext();
@@ -94,10 +94,8 @@ public class StatementJobRepository {
         statementJob.setTimeStartJob(null);
 
         context.commitChanges();
-        String id = Cayenne.pkForObject(statementJob).toString();
-        Cayenne.longPKForObject(statementJob);
 
-        return new SavedStatementJob(id, statementJob);
+        return statementJob;
     }
 
 }

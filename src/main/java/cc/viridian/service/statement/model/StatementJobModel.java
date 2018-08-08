@@ -20,6 +20,7 @@ public class StatementJobModel {
     private String accountCurrency;
     private String accountType;
     private String customerCode;
+    private String recipient;
     private Integer errorBankCode;
     private String errorBankDesc;
     private Integer errorSendCode;
@@ -50,6 +51,7 @@ public class StatementJobModel {
         localDateTime = statementJob.getLocalDateTime();
         processDate = statementJob.getProcessDate();
         retryNumber = statementJob.getRetryNumber();
+        recipient = statementJob.getSendRecipient();
         send = statementJob.getAdapterSend();
         format = statementJob.getAdapterFormat();
         corebank = statementJob.getAdapterCorebank();

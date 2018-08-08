@@ -1,7 +1,9 @@
 package cc.viridian.service.statement.service;
 
 import cc.viridian.service.statement.model.JobTemplate;
+import cc.viridian.service.statement.model.StatementJobModel;
 import cc.viridian.service.statement.payload.*;
+import cc.viridian.service.statement.persistence.StatementJob;
 import cc.viridian.service.statement.repository.StatementJobProducer;
 import cc.viridian.service.statement.repository.StatementJobRepository;
 import lombok.NoArgsConstructor;
@@ -30,16 +32,16 @@ public class JobService {
     }
 
 
-    public String registerSingleJob(RegisterJobPost body) {
+    public StatementJobModel registerSingleJob(RegisterJobPost body) {
 
-        SavedStatementJob saved = statementJobRepository.registerSingleJob(body);
+        StatementJobModel statementJob = new StatementJobModel(statementJobRepository.registerSingleJob(body));
 
         //send message to kafka
-        JobTemplate jobTemplate = new JobTemplate(saved.getStatementJob());
+        JobTemplate jobTemplate = new JobTemplate(statementJob);
 
-        jobKafkaProducer.send(saved.getId(), jobTemplate);
+        jobKafkaProducer.send(statementJob.getId().toString(), jobTemplate);
 
-        return saved.getId();
+        return statementJob;
     }
 
 }

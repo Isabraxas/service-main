@@ -1,5 +1,6 @@
 package cc.viridian.service.statement.controller;
 
+import cc.viridian.service.statement.model.StatementJobModel;
 import cc.viridian.service.statement.payload.ListJobsResponse;
 import cc.viridian.service.statement.payload.RegisterJobPost;
 import cc.viridian.service.statement.service.JobService;
@@ -16,7 +17,7 @@ public class JobController {
 
     @RequestMapping(method = RequestMethod.POST, value="/job")
     @ResponseBody
-    public String registerNewJob(
+    public StatementJobModel registerSingleJob(
         @RequestBody RegisterJobPost body)
     {
         return jobService.registerSingleJob(body);
@@ -32,7 +33,7 @@ public class JobController {
 
     @RequestMapping(method = RequestMethod.POST, value="/job/single")
     @ResponseBody
-    public String processSingleJob(
+    public StatementJobModel processSingleJob(
         @RequestBody RegisterJobPost body)
     {
         return jobService.registerSingleJob(body);
