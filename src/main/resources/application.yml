@@ -13,6 +13,7 @@ spring:
 topic:
   statement:
     jobs: jobs2
+    update: update3
 
 
 database:

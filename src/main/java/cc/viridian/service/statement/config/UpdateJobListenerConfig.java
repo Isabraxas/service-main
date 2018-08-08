@@ -1,8 +1,11 @@
 package cc.viridian.service.statement.config;
 
-import cc.viridian.service.statement.model.JobTemplate;
+import cc.viridian.service.statement.model.UpdateJobTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,16 +13,22 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
 @EnableKafka
-public class StatementJobListenerConfig {
+public class UpdateJobListenerConfig {
+
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Bean
     public Map<String, Object> consumerConfigs() {
@@ -33,16 +42,22 @@ public class StatementJobListenerConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, JobTemplate> consumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(
-            consumerConfigs(),
-            new StringDeserializer(),
-            new JsonDeserializer<>(JobTemplate.class));
+    public ConsumerFactory<String, UpdateJobTemplate> consumerFactory() {
+        JsonDeserializer<UpdateJobTemplate> jsonDeserializer = new JsonDeserializer(UpdateJobTemplate.class, objectMapper);
+        DefaultKafkaConsumerFactory<String, UpdateJobTemplate> consumerFactory =
+            new DefaultKafkaConsumerFactory<>(consumerConfigs(),
+                                              new StringDeserializer(),
+                                                jsonDeserializer
+//                                              new JsonDeserializer<UpdateJobTemplate>(objectMapper)
+                                              //new JsonDeserializer(UpdateJobTemplate.class)
+            );
+        return consumerFactory;
+
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, JobTemplate> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, JobTemplate> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, UpdateJobTemplate> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, UpdateJobTemplate> factory =
             new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;
