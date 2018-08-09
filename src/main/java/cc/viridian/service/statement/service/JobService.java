@@ -2,6 +2,7 @@ package cc.viridian.service.statement.service;
 
 import cc.viridian.service.statement.model.JobTemplate;
 import cc.viridian.service.statement.model.StatementJobModel;
+import cc.viridian.service.statement.model.UpdateJobTemplate;
 import cc.viridian.service.statement.payload.*;
 import cc.viridian.service.statement.persistence.StatementJob;
 import cc.viridian.service.statement.repository.StatementJobProducer;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Service;
 public class JobService {
 
     @Autowired
-    StatementJobProducer jobKafkaProducer;
+    StatementJobProducer statementJobProducer;
 
     private StatementJobRepository statementJobRepository;
 
@@ -34,14 +35,29 @@ public class JobService {
 
     public StatementJobModel registerSingleJob(RegisterJobPost body) {
 
-        StatementJobModel statementJob = new StatementJobModel(statementJobRepository.registerSingleJob(body));
+        StatementJob statementJob = statementJobRepository.registerSingleJob(body);
+        StatementJobModel statementJobModel = new StatementJobModel(statementJob);
 
         //send message to kafka
-        JobTemplate jobTemplate = new JobTemplate(statementJob);
+        JobTemplate jobTemplate = new JobTemplate(statementJobModel);
 
-        jobKafkaProducer.send(statementJob.getId().toString(), jobTemplate);
+        statementJobProducer.send(statementJobModel.getId().toString(), jobTemplate);
 
-        return statementJob;
+        return statementJobModel;
     }
 
+    public Boolean updateJob(UpdateJobTemplate data) {
+        StatementJob statementJob = statementJobRepository.findById(data.getId());
+
+        if (data.getAdapterType().equalsIgnoreCase("corebank")) {
+            statementJob.setStatus("IN PROGRESS");
+            statementJob.setTimeStartJob(data.getLocalDateTime());
+            //statementJob.setErrorBankCode(data.getErrorCode());
+            statementJob.setErrorBankDesc(data.getErrorDesc());
+        }
+
+        statementJobRepository.updateStatementJob(statementJob);
+
+        return true;
+    }
 }

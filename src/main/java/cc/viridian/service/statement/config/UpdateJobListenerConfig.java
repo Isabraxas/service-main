@@ -44,12 +44,11 @@ public class UpdateJobListenerConfig {
     @Bean
     public ConsumerFactory<String, UpdateJobTemplate> consumerFactory() {
         JsonDeserializer<UpdateJobTemplate> jsonDeserializer = new JsonDeserializer(UpdateJobTemplate.class, objectMapper);
+
         DefaultKafkaConsumerFactory<String, UpdateJobTemplate> consumerFactory =
             new DefaultKafkaConsumerFactory<>(consumerConfigs(),
                                               new StringDeserializer(),
                                                 jsonDeserializer
-//                                              new JsonDeserializer<UpdateJobTemplate>(objectMapper)
-                                              //new JsonDeserializer(UpdateJobTemplate.class)
             );
         return consumerFactory;
 

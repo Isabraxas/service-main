@@ -9,6 +9,7 @@ import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.configuration.server.ServerRuntime;
 import org.apache.cayenne.query.EJBQLQuery;
 import org.apache.cayenne.query.ObjectSelect;
+import org.apache.cayenne.query.SelectById;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
@@ -61,6 +62,23 @@ public class StatementJobRepository {
         List<Long> result = context.performQuery(query);
 
         return result.get(0);
+    }
+
+    public StatementJob updateStatementJob(StatementJob statementJob) {
+        statementJob.getObjectContext().commitChanges();
+        return statementJob;
+    }
+
+    public StatementJob findById (Long id)
+    {
+        ObjectContext context = mainServerRuntime.newContext();
+
+        if (id != null && id > 0) {
+            StatementJob statementJob = SelectById.query(StatementJob.class, "" + id ).selectOne(context);
+
+            return statementJob;
+        }
+        return null;
     }
 
     public StatementJob registerSingleJob(RegisterJobPost body) {
