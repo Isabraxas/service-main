@@ -63,16 +63,19 @@
 		<db-attribute name="ADAPTER_COREBANK" type="VARCHAR" length="20"/>
 		<db-attribute name="ADAPTER_FORMAT" type="VARCHAR" length="20"/>
 		<db-attribute name="ADAPTER_SEND" type="VARCHAR" length="20"/>
+		<db-attribute name="COREBANK_ERROR_CODE" type="VARCHAR" length="20"/>
+		<db-attribute name="COREBANK_ERROR_DESC" type="VARCHAR" length="250"/>
+		<db-attribute name="COREBANK_RETRIES" type="INTEGER"/>
+		<db-attribute name="COREBANK_TRY_AGAIN_AT" type="TIMESTAMP"/>
 		<db-attribute name="CUSTOMER_CODE" type="VARCHAR" length="20"/>
-		<db-attribute name="ERROR_BANK_CODE" type="INTEGER"/>
-		<db-attribute name="ERROR_BANK_DESC" type="VARCHAR" length="200"/>
-		<db-attribute name="ERROR_SEND_CODE" type="INTEGER"/>
-		<db-attribute name="ERROR_SEND_DESC" type="VARCHAR" length="200"/>
-		<db-attribute name="FREQUENCY" type="CHAR" length="10"/>
+		<db-attribute name="FREQUENCY" type="VARCHAR" length="10"/>
 		<db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
-		<db-attribute name="LOCAL_DATE_TIME" type="TIMESTAMP"/>
-		<db-attribute name="PROCESS_DATE" type="CHAR" length="8"/>
-		<db-attribute name="RETRY_NUMBER" type="INTEGER"/>
+		<db-attribute name="PROCESS_DATE_FROM" type="DATE"/>
+		<db-attribute name="PROCESS_DATE_TO" type="DATE"/>
+		<db-attribute name="SENDER_ERROR_CODE" type="VARCHAR" length="20"/>
+		<db-attribute name="SENDER_ERROR_DESC" type="VARCHAR" length="250"/>
+		<db-attribute name="SENDER_RETRIES" type="INTEGER"/>
+		<db-attribute name="SENDER_TRY_AGAIN_AT" type="TIMESTAMP"/>
 		<db-attribute name="SEND_RECIPIENT" type="VARCHAR" length="255"/>
 		<db-attribute name="STATUS" type="CHAR" length="20"/>
 		<db-attribute name="TIME_CREATE_JOB" type="TIMESTAMP"/>
@@ -114,23 +117,6 @@
 		<obj-attribute name="usrCreate" type="java.lang.String" db-attribute-path="USR_CREATE"/>
 		<obj-attribute name="usrModify" type="java.lang.String" db-attribute-path="USR_MODIFY"/>
 	</obj-entity>
-	<obj-entity name="StatementDetail" className="cc.viridian.service.statement.persistence.StatementDetail" dbEntityName="STATEMENT_DETAIL">
-		<obj-attribute name="accountCode" type="java.lang.String" db-attribute-path="ACCOUNT_CODE"/>
-		<obj-attribute name="accountCurrency" type="java.lang.String" db-attribute-path="ACCOUNT_CURRENCY"/>
-		<obj-attribute name="accountType" type="java.lang.String" db-attribute-path="ACCOUNT_TYPE"/>
-		<obj-attribute name="amount" type="java.math.BigDecimal" db-attribute-path="AMOUNT"/>
-		<obj-attribute name="annotation" type="java.lang.String" db-attribute-path="ANNOTATION"/>
-		<obj-attribute name="balance" type="java.math.BigDecimal" db-attribute-path="BALANCE"/>
-		<obj-attribute name="branchChannel" type="java.lang.String" db-attribute-path="BRANCH_CHANNEL"/>
-		<obj-attribute name="date" type="java.lang.String" db-attribute-path="DATE"/>
-		<obj-attribute name="debitCredit" type="java.lang.String" db-attribute-path="DEBIT_CREDIT"/>
-		<obj-attribute name="localDateTime" type="java.time.LocalDateTime" db-attribute-path="LOCAL_DATE_TIME"/>
-		<obj-attribute name="referenceNumber" type="java.lang.String" db-attribute-path="REFERENCE_NUMBER"/>
-		<obj-attribute name="secondaryInfo" type="java.lang.String" db-attribute-path="SECONDARY_INFO"/>
-		<obj-attribute name="transactionCode" type="java.lang.String" db-attribute-path="TRANSACTION_CODE"/>
-		<obj-attribute name="transactionDesc" type="java.lang.String" db-attribute-path="TRANSACTION_DESC"/>
-		<obj-attribute name="trnId" type="java.lang.String" db-attribute-path="TRN_ID"/>
-	</obj-entity>
 	<obj-entity name="StatementHeader" className="cc.viridian.service.statement.persistence.StatementHeader" dbEntityName="STATEMENT_HEADER">
 		<obj-attribute name="accountAddress" type="java.lang.String" db-attribute-path="ACCOUNT_ADDRESS"/>
 		<obj-attribute name="accountBranch" type="java.lang.String" db-attribute-path="ACCOUNT_BRANCH"/>
@@ -153,16 +139,21 @@
 		<obj-attribute name="adapterCorebank" type="java.lang.String" db-attribute-path="ADAPTER_COREBANK"/>
 		<obj-attribute name="adapterFormat" type="java.lang.String" db-attribute-path="ADAPTER_FORMAT"/>
 		<obj-attribute name="adapterSend" type="java.lang.String" db-attribute-path="ADAPTER_SEND"/>
+		<obj-attribute name="coreBankRetries" type="int" db-attribute-path="COREBANK_RETRIES"/>
 		<obj-attribute name="customerCode" type="java.lang.String" db-attribute-path="CUSTOMER_CODE"/>
-		<obj-attribute name="errorBankCode" type="int" db-attribute-path="ERROR_BANK_CODE"/>
-		<obj-attribute name="errorBankDesc" type="java.lang.String" db-attribute-path="ERROR_BANK_DESC"/>
-		<obj-attribute name="errorSendCode" type="int" db-attribute-path="ERROR_SEND_CODE"/>
-		<obj-attribute name="errorSendDesc" type="java.lang.String" db-attribute-path="ERROR_SEND_DESC"/>
+		<obj-attribute name="errorBankCode" type="int" db-attribute-path="COREBANK_ERROR_CODE"/>
+		<obj-attribute name="errorBankDesc" type="java.lang.String" db-attribute-path="COREBANK_ERROR_DESC"/>
+		<obj-attribute name="errorSendCode" type="int" db-attribute-path="SENDER_ERROR_CODE"/>
+		<obj-attribute name="errorSendDesc" type="java.lang.String" db-attribute-path="SENDER_ERROR_DESC"/>
 		<obj-attribute name="frequency" type="java.lang.String" db-attribute-path="FREQUENCY"/>
 		<obj-attribute name="localDateTime" type="java.time.LocalDateTime" db-attribute-path="LOCAL_DATE_TIME"/>
 		<obj-attribute name="processDate" type="java.lang.String" db-attribute-path="PROCESS_DATE"/>
-		<obj-attribute name="retryNumber" type="int" db-attribute-path="RETRY_NUMBER"/>
+		<obj-attribute name="processDateFrom" type="java.time.LocalDate" db-attribute-path="PROCESS_DATE_FROM"/>
+		<obj-attribute name="processDateTo" type="java.time.LocalDate" db-attribute-path="PROCESS_DATE_TO"/>
+		<obj-attribute name="retryNumber" type="int" db-attribute-path="COREBANK_TRY_AGAIN_AT"/>
 		<obj-attribute name="sendRecipient" type="java.lang.String" db-attribute-path="SEND_RECIPIENT"/>
+		<obj-attribute name="senderRetries" type="int" db-attribute-path="SENDER_RETRIES"/>
+		<obj-attribute name="senderTryAgainAt" type="java.time.LocalDateTime" db-attribute-path="SENDER_TRY_AGAIN_AT"/>
 		<obj-attribute name="status" type="java.lang.String" db-attribute-path="STATUS"/>
 		<obj-attribute name="timeCreateJob" type="java.time.LocalDateTime" db-attribute-path="TIME_CREATE_JOB"/>
 		<obj-attribute name="timeEndJob" type="java.time.LocalDateTime" db-attribute-path="TIME_END_JOB"/>
