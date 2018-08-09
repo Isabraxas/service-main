@@ -1,8 +1,10 @@
 package cc.viridian.service.statement.config;
 
 import cc.viridian.service.statement.model.JobTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,9 @@ public class StatementJobProducerConfig {
     @Value("${topic.statement.jobs}")
     private String topicStatementJobs;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @Bean
     public Map<String, Object> producerConfigs() {
         Map<String, Object> props = new HashMap<>();
@@ -31,7 +36,12 @@ public class StatementJobProducerConfig {
     }
 
     private ProducerFactory<String, JobTemplate> producerFactory() {
-        return new DefaultKafkaProducerFactory<>(producerConfigs());
+        DefaultKafkaProducerFactory<String, JobTemplate> producerFactory =
+            new DefaultKafkaProducerFactory<>(producerConfigs(),
+                                              new StringSerializer(),
+                                              new JsonSerializer<JobTemplate>(objectMapper)
+            );
+        return producerFactory;
     }
 
     @Bean
