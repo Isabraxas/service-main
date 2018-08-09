@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.cayenne.Cayenne;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -19,20 +20,31 @@ public class StatementJobModel {
     private String accountCode;
     private String accountCurrency;
     private String accountType;
+
     private String customerCode;
     private String recipient;
-    private Integer errorBankCode;
-    private String errorBankDesc;
-    private Integer errorSendCode;
-    private String errorSendDesc;
+
+    private String corebankErrorCode;
+    private String corebankErrorDesc;
+    private Integer corebankRetries;
+    private LocalDateTime corebankTryAgainAt;
+
     private String frequency;
-    private LocalDateTime localDateTime;
-    private String processDate;
-    private Integer retryNumber;
-    private String send;
-    private String format;
+    private LocalDate dateFrom;
+    private LocalDate dateTo;
+
+    private String senderErrorCode;
+    private String senderErrorDesc;
+    private Integer senderRetries;
+    private LocalDateTime senderTryAgainAt;
+
+
     private String corebank;
+    private String format;
+    private String sender;
+
     private String status;
+
     private LocalDateTime timeCreateJob;
     private LocalDateTime timeEndJob;
     private LocalDateTime timeStartJob;
@@ -42,19 +54,28 @@ public class StatementJobModel {
         accountCode = statementJob.getAccountCode();
         accountCurrency = statementJob.getAccountCurrency();
         accountType = statementJob.getAccountType();
+
         customerCode = statementJob.getCustomerCode();
-        errorBankCode = statementJob.getErrorBankCode();
-        errorBankDesc = statementJob.getErrorBankDesc();
-        errorSendCode = statementJob.getErrorSendCode();
-        errorSendDesc = statementJob.getErrorSendDesc();
-        frequency = statementJob.getFrequency();
-        localDateTime = statementJob.getLocalDateTime();
-        processDate = statementJob.getProcessDate();
-        retryNumber = statementJob.getRetryNumber();
         recipient = statementJob.getSendRecipient();
-        send = statementJob.getAdapterSend();
-        format = statementJob.getAdapterFormat();
+
+        corebankErrorCode = statementJob.getCorebankErrorCode();
+        corebankErrorDesc = statementJob.getCorebankErrorDesc();
+        corebankRetries = statementJob.getCorebankRetries();
+        corebankTryAgainAt = statementJob.getCorebankTryAgainAt();
+
+        frequency = statementJob.getFrequency();
+        dateFrom = statementJob.getProcessDateFrom();
+        dateTo = statementJob.getProcessDateTo();
+
+        senderErrorCode = statementJob.getSenderErrorCode();
+        senderErrorDesc = statementJob.getSenderErrorDesc();
+        senderRetries = statementJob.getSenderRetries();
+        senderTryAgainAt = statementJob.getSenderTryAgainAt();
+
         corebank = statementJob.getAdapterCorebank();
+        format = statementJob.getAdapterFormat();
+        sender = statementJob.getAdapterSend();
+
         status = statementJob.getStatus();
         timeCreateJob = statementJob.getTimeCreateJob();
         timeEndJob = statementJob.getTimeEndJob();

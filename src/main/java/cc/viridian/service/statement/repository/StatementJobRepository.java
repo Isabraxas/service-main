@@ -13,9 +13,11 @@ import org.apache.cayenne.query.SelectById;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import static java.time.ZoneId.SHORT_IDS;
 
 @Slf4j
 @Repository
@@ -90,21 +92,27 @@ public class StatementJobRepository {
         statementJob.setAccountCode(body.getAccount());
         statementJob.setAccountCurrency(body.getCurrency());
         statementJob.setAccountType(body.getType());
-        statementJob.setFrequency(body.getFrequency());
         statementJob.setCustomerCode(body.getCustomerCode());
         statementJob.setSendRecipient(body.getRecipient());
-        statementJob.setAdapterCorebank(body.getCoreBankAdapter());
+
+        statementJob.setFrequency(body.getFrequency());
+        statementJob.setProcessDateFrom(body.getDateFrom());
+        statementJob.setProcessDateTo(body.getDateTo());
+
+        statementJob.setAdapterCorebank(body.getCorebankAdapter());
         statementJob.setAdapterFormat(body.getFormatAdapter());
         statementJob.setAdapterSend(body.getSendAdapter());
 
-        statementJob.setErrorBankCode(0);
-        statementJob.setErrorBankDesc("");
-        statementJob.setErrorSendCode(0);
-        statementJob.setErrorSendDesc("");
+        statementJob.setCorebankErrorCode("");
+        statementJob.setCorebankErrorDesc("");
+        statementJob.setCorebankRetries(0);
+        statementJob.setCorebankTryAgainAt(null);
 
-        statementJob.setLocalDateTime(LocalDateTime.now());
-        statementJob.setProcessDate("201807"); //todo: fix
-        statementJob.setRetryNumber(0);
+        statementJob.setSenderErrorCode("");
+        statementJob.setSenderErrorDesc("");
+        statementJob.setSenderRetries(0);
+        statementJob.setSenderTryAgainAt(null);
+
         statementJob.setStatus("OPEN");
 
         statementJob.setTimeCreateJob(LocalDateTime.now());

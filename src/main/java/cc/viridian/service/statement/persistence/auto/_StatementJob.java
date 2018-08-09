@@ -1,5 +1,6 @@
 package cc.viridian.service.statement.persistence.auto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.apache.cayenne.CayenneDataObject;
@@ -23,16 +24,19 @@ public abstract class _StatementJob extends CayenneDataObject {
     public static final Property<String> ADAPTER_COREBANK = Property.create("adapterCorebank", String.class);
     public static final Property<String> ADAPTER_FORMAT = Property.create("adapterFormat", String.class);
     public static final Property<String> ADAPTER_SEND = Property.create("adapterSend", String.class);
+    public static final Property<String> COREBANK_ERROR_CODE = Property.create("corebankErrorCode", String.class);
+    public static final Property<String> COREBANK_ERROR_DESC = Property.create("corebankErrorDesc", String.class);
+    public static final Property<Integer> COREBANK_RETRIES = Property.create("corebankRetries", Integer.class);
+    public static final Property<LocalDateTime> COREBANK_TRY_AGAIN_AT = Property.create("corebankTryAgainAt", LocalDateTime.class);
     public static final Property<String> CUSTOMER_CODE = Property.create("customerCode", String.class);
-    public static final Property<Integer> ERROR_BANK_CODE = Property.create("errorBankCode", Integer.class);
-    public static final Property<String> ERROR_BANK_DESC = Property.create("errorBankDesc", String.class);
-    public static final Property<Integer> ERROR_SEND_CODE = Property.create("errorSendCode", Integer.class);
-    public static final Property<String> ERROR_SEND_DESC = Property.create("errorSendDesc", String.class);
     public static final Property<String> FREQUENCY = Property.create("frequency", String.class);
-    public static final Property<LocalDateTime> LOCAL_DATE_TIME = Property.create("localDateTime", LocalDateTime.class);
-    public static final Property<String> PROCESS_DATE = Property.create("processDate", String.class);
-    public static final Property<Integer> RETRY_NUMBER = Property.create("retryNumber", Integer.class);
+    public static final Property<LocalDate> PROCESS_DATE_FROM = Property.create("processDateFrom", LocalDate.class);
+    public static final Property<LocalDate> PROCESS_DATE_TO = Property.create("processDateTo", LocalDate.class);
     public static final Property<String> SEND_RECIPIENT = Property.create("sendRecipient", String.class);
+    public static final Property<String> SENDER_ERROR_CODE = Property.create("senderErrorCode", String.class);
+    public static final Property<String> SENDER_ERROR_DESC = Property.create("senderErrorDesc", String.class);
+    public static final Property<Integer> SENDER_RETRIES = Property.create("senderRetries", Integer.class);
+    public static final Property<LocalDateTime> SENDER_TRY_AGAIN_AT = Property.create("senderTryAgainAt", LocalDateTime.class);
     public static final Property<String> STATUS = Property.create("status", String.class);
     public static final Property<LocalDateTime> TIME_CREATE_JOB = Property.create("timeCreateJob", LocalDateTime.class);
     public static final Property<LocalDateTime> TIME_END_JOB = Property.create("timeEndJob", LocalDateTime.class);
@@ -80,41 +84,40 @@ public abstract class _StatementJob extends CayenneDataObject {
         return (String)readProperty("adapterSend");
     }
 
+    public void setCorebankErrorCode(String corebankErrorCode) {
+        writeProperty("corebankErrorCode", corebankErrorCode);
+    }
+    public String getCorebankErrorCode() {
+        return (String)readProperty("corebankErrorCode");
+    }
+
+    public void setCorebankErrorDesc(String corebankErrorDesc) {
+        writeProperty("corebankErrorDesc", corebankErrorDesc);
+    }
+    public String getCorebankErrorDesc() {
+        return (String)readProperty("corebankErrorDesc");
+    }
+
+    public void setCorebankRetries(int corebankRetries) {
+        writeProperty("corebankRetries", corebankRetries);
+    }
+    public int getCorebankRetries() {
+        Object value = readProperty("corebankRetries");
+        return (value != null) ? (Integer) value : 0;
+    }
+
+    public void setCorebankTryAgainAt(LocalDateTime corebankTryAgainAt) {
+        writeProperty("corebankTryAgainAt", corebankTryAgainAt);
+    }
+    public LocalDateTime getCorebankTryAgainAt() {
+        return (LocalDateTime)readProperty("corebankTryAgainAt");
+    }
+
     public void setCustomerCode(String customerCode) {
         writeProperty("customerCode", customerCode);
     }
     public String getCustomerCode() {
         return (String)readProperty("customerCode");
-    }
-
-    public void setErrorBankCode(int errorBankCode) {
-        writeProperty("errorBankCode", errorBankCode);
-    }
-    public int getErrorBankCode() {
-        Object value = readProperty("errorBankCode");
-        return (value != null) ? (Integer) value : 0;
-    }
-
-    public void setErrorBankDesc(String errorBankDesc) {
-        writeProperty("errorBankDesc", errorBankDesc);
-    }
-    public String getErrorBankDesc() {
-        return (String)readProperty("errorBankDesc");
-    }
-
-    public void setErrorSendCode(int errorSendCode) {
-        writeProperty("errorSendCode", errorSendCode);
-    }
-    public int getErrorSendCode() {
-        Object value = readProperty("errorSendCode");
-        return (value != null) ? (Integer) value : 0;
-    }
-
-    public void setErrorSendDesc(String errorSendDesc) {
-        writeProperty("errorSendDesc", errorSendDesc);
-    }
-    public String getErrorSendDesc() {
-        return (String)readProperty("errorSendDesc");
     }
 
     public void setFrequency(String frequency) {
@@ -124,26 +127,18 @@ public abstract class _StatementJob extends CayenneDataObject {
         return (String)readProperty("frequency");
     }
 
-    public void setLocalDateTime(LocalDateTime localDateTime) {
-        writeProperty("localDateTime", localDateTime);
+    public void setProcessDateFrom(LocalDate processDateFrom) {
+        writeProperty("processDateFrom", processDateFrom);
     }
-    public LocalDateTime getLocalDateTime() {
-        return (LocalDateTime)readProperty("localDateTime");
-    }
-
-    public void setProcessDate(String processDate) {
-        writeProperty("processDate", processDate);
-    }
-    public String getProcessDate() {
-        return (String)readProperty("processDate");
+    public LocalDate getProcessDateFrom() {
+        return (LocalDate)readProperty("processDateFrom");
     }
 
-    public void setRetryNumber(int retryNumber) {
-        writeProperty("retryNumber", retryNumber);
+    public void setProcessDateTo(LocalDate processDateTo) {
+        writeProperty("processDateTo", processDateTo);
     }
-    public int getRetryNumber() {
-        Object value = readProperty("retryNumber");
-        return (value != null) ? (Integer) value : 0;
+    public LocalDate getProcessDateTo() {
+        return (LocalDate)readProperty("processDateTo");
     }
 
     public void setSendRecipient(String sendRecipient) {
@@ -151,6 +146,35 @@ public abstract class _StatementJob extends CayenneDataObject {
     }
     public String getSendRecipient() {
         return (String)readProperty("sendRecipient");
+    }
+
+    public void setSenderErrorCode(String senderErrorCode) {
+        writeProperty("senderErrorCode", senderErrorCode);
+    }
+    public String getSenderErrorCode() {
+        return (String)readProperty("senderErrorCode");
+    }
+
+    public void setSenderErrorDesc(String senderErrorDesc) {
+        writeProperty("senderErrorDesc", senderErrorDesc);
+    }
+    public String getSenderErrorDesc() {
+        return (String)readProperty("senderErrorDesc");
+    }
+
+    public void setSenderRetries(int senderRetries) {
+        writeProperty("senderRetries", senderRetries);
+    }
+    public int getSenderRetries() {
+        Object value = readProperty("senderRetries");
+        return (value != null) ? (Integer) value : 0;
+    }
+
+    public void setSenderTryAgainAt(LocalDateTime senderTryAgainAt) {
+        writeProperty("senderTryAgainAt", senderTryAgainAt);
+    }
+    public LocalDateTime getSenderTryAgainAt() {
+        return (LocalDateTime)readProperty("senderTryAgainAt");
     }
 
     public void setStatus(String status) {

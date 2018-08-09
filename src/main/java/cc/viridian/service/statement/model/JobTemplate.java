@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.cayenne.Cayenne;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,37 +17,59 @@ public class JobTemplate {
     private String account;
     private String currency;
     private String type;
-    private String frequency;
-    private String customerCode;
-    private String recipient;
+
+    private String corebankAdapter;
     private String formatAdapter;
     private String sendAdapter;
-    private String coreBankAdapter;
+
+    private String customerCode;
+    private String recipient;
+
+    private String frequency;
+
+    private LocalDate dateFrom;
+    private LocalDate dateTo;
+
+    private Integer attemptNumber;
 
     public JobTemplate(StatementJob job) {
         this.id = Cayenne.longPKForObject(job);
+
         this.account = job.getAccountCode();
         this.currency = job.getAccountCurrency();
         this.type = job.getAccountType();
-        this.frequency = job.getFrequency();
-        this.customerCode = job.getCustomerCode();
-        this.recipient = job.getSendRecipient();
+
+        this.corebankAdapter = job.getAdapterCorebank();
         this.formatAdapter = job.getAdapterFormat();
         this.sendAdapter = job.getAdapterSend();
-        this.coreBankAdapter = job.getAdapterCorebank();
+
+        this.customerCode = job.getCustomerCode();
+        this.recipient = job.getSendRecipient();
+
+        this.frequency = job.getFrequency();
+        this.dateFrom = job.getProcessDateFrom();
+        this.dateTo = job.getProcessDateTo();
+        this.attemptNumber = job.getCorebankRetries() +1;
     }
 
+    @Deprecated //not used
     public JobTemplate(StatementJobModel job) {
         this.id = job.getId();
         this.account = job.getAccountCode();
         this.currency = job.getAccountCurrency();
         this.type = job.getAccountType();
-        this.frequency = job.getFrequency();
+
+        this.corebankAdapter = job.getCorebank();
+        this.formatAdapter = job.getFormat();
+        this.sendAdapter = job.getSender();
+
         this.customerCode = job.getCustomerCode();
         this.recipient = job.getRecipient();
-        this.formatAdapter = job.getFormat();
-        this.sendAdapter = job.getSend();
-        this.coreBankAdapter = job.getCorebank();
+
+        this.frequency = job.getFrequency();
+        this.dateFrom = job.getDateFrom();
+        this.dateTo = job.getDateTo();
+        this.attemptNumber = job.getCorebankRetries() +1;
     }
 
     @Override
@@ -57,12 +80,14 @@ public class JobTemplate {
         sb.append("account: " + account + " ");
         sb.append("currency: " + currency + " ");
         sb.append("type: " + type + " ");
-        sb.append("frequency: " + frequency + " ");
         sb.append("customerCode: " + customerCode + " ");
         sb.append("recipient: " + recipient + " ");
+        sb.append("frequency: " + frequency + " ");
+        sb.append("from: " + dateFrom + " ");
+        sb.append("to: " + dateTo + " ");
         sb.append("formatAdapter: " + formatAdapter + " ");
         sb.append("sendAdapter: " + sendAdapter + " ");
-        sb.append("coreBankAdapter: " + coreBankAdapter + " ");
+        sb.append("corebankAdapter: " + corebankAdapter + " ");
         return sb.toString();
     }
 }

@@ -36,28 +36,29 @@ public class JobService {
     public StatementJobModel registerSingleJob(RegisterJobPost body) {
 
         StatementJob statementJob = statementJobRepository.registerSingleJob(body);
-        StatementJobModel statementJobModel = new StatementJobModel(statementJob);
+
+        //creates a job template using the business model
+        JobTemplate jobTemplate = new JobTemplate(statementJob);
 
         //send message to kafka
-        JobTemplate jobTemplate = new JobTemplate(statementJobModel);
+        statementJobProducer.send("" + jobTemplate.getId(), jobTemplate);
 
-        statementJobProducer.send(statementJobModel.getId().toString(), jobTemplate);
-
-        return statementJobModel;
+        return new StatementJobModel(statementJob);
     }
 
-    public Boolean updateJob(UpdateJobTemplate data) {
+    public StatementJobModel updateJob(UpdateJobTemplate data) {
         StatementJob statementJob = statementJobRepository.findById(data.getId());
 
         if (data.getAdapterType().equalsIgnoreCase("corebank")) {
             statementJob.setStatus("IN PROGRESS");
             statementJob.setTimeStartJob(data.getLocalDateTime());
-            //statementJob.setErrorBankCode(data.getErrorCode());
-            statementJob.setErrorBankDesc(data.getErrorDesc());
+            statementJob.setCorebankErrorCode(data.getErrorCode());
+            statementJob.setCorebankErrorDesc(data.getErrorDesc());
+            //statementJob.setCorebankRetries();
         }
 
         statementJobRepository.updateStatementJob(statementJob);
 
-        return true;
+        return new StatementJobModel(statementJob);
     }
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,12 +14,15 @@ public class RegisterJobPost {
     private String account;
     private String currency;
     private String type;
-    private String frequency;
-    private String customerCode;
-    private String customerName;
 
+    private String customerCode;
     private String recipient;
+
+    private String frequency;
+    private LocalDate dateFrom;
+    private LocalDate dateTo;
+
+    private String corebankAdapter;
     private String formatAdapter;
     private String sendAdapter;
-    private String coreBankAdapter;
 }
