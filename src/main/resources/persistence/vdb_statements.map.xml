@@ -139,19 +139,17 @@
 		<obj-attribute name="adapterCorebank" type="java.lang.String" db-attribute-path="ADAPTER_COREBANK"/>
 		<obj-attribute name="adapterFormat" type="java.lang.String" db-attribute-path="ADAPTER_FORMAT"/>
 		<obj-attribute name="adapterSend" type="java.lang.String" db-attribute-path="ADAPTER_SEND"/>
-		<obj-attribute name="coreBankRetries" type="int" db-attribute-path="COREBANK_RETRIES"/>
+		<obj-attribute name="corebankErrorCode" type="java.lang.String" db-attribute-path="COREBANK_ERROR_CODE"/>
+		<obj-attribute name="corebankErrorDesc" type="java.lang.String" db-attribute-path="COREBANK_ERROR_DESC"/>
+		<obj-attribute name="corebankRetries" type="int" db-attribute-path="COREBANK_RETRIES"/>
+		<obj-attribute name="corebankTryAgainAt" type="java.time.LocalDateTime" db-attribute-path="COREBANK_TRY_AGAIN_AT"/>
 		<obj-attribute name="customerCode" type="java.lang.String" db-attribute-path="CUSTOMER_CODE"/>
-		<obj-attribute name="errorBankCode" type="int" db-attribute-path="COREBANK_ERROR_CODE"/>
-		<obj-attribute name="errorBankDesc" type="java.lang.String" db-attribute-path="COREBANK_ERROR_DESC"/>
-		<obj-attribute name="errorSendCode" type="int" db-attribute-path="SENDER_ERROR_CODE"/>
-		<obj-attribute name="errorSendDesc" type="java.lang.String" db-attribute-path="SENDER_ERROR_DESC"/>
 		<obj-attribute name="frequency" type="java.lang.String" db-attribute-path="FREQUENCY"/>
-		<obj-attribute name="localDateTime" type="java.time.LocalDateTime" db-attribute-path="LOCAL_DATE_TIME"/>
-		<obj-attribute name="processDate" type="java.lang.String" db-attribute-path="PROCESS_DATE"/>
 		<obj-attribute name="processDateFrom" type="java.time.LocalDate" db-attribute-path="PROCESS_DATE_FROM"/>
 		<obj-attribute name="processDateTo" type="java.time.LocalDate" db-attribute-path="PROCESS_DATE_TO"/>
-		<obj-attribute name="retryNumber" type="int" db-attribute-path="COREBANK_TRY_AGAIN_AT"/>
 		<obj-attribute name="sendRecipient" type="java.lang.String" db-attribute-path="SEND_RECIPIENT"/>
+		<obj-attribute name="senderErrorCode" type="java.lang.String" db-attribute-path="SENDER_ERROR_CODE"/>
+		<obj-attribute name="senderErrorDesc" type="java.lang.String" db-attribute-path="SENDER_ERROR_DESC"/>
 		<obj-attribute name="senderRetries" type="int" db-attribute-path="SENDER_RETRIES"/>
 		<obj-attribute name="senderTryAgainAt" type="java.time.LocalDateTime" db-attribute-path="SENDER_TRY_AGAIN_AT"/>
 		<obj-attribute name="status" type="java.lang.String" db-attribute-path="STATUS"/>

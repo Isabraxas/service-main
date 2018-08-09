@@ -17,7 +17,7 @@ public class MainApplication {
 		SpringApplication.run(MainApplication.class, args);
 
         ZoneId defaultZoneId = ZoneId.systemDefault();
-        System.out.println("System Default TimeZone : " + defaultZoneId);
+        log.info("System Default TimeZone : " + defaultZoneId);
 
 		//sandbox
         /*
