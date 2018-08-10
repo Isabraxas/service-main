@@ -1,7 +1,5 @@
 package cc.viridian.service.statement;
 
-import cc.viridian.provider.model.Statement;
-import cc.viridian.service.statement.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,11 +19,6 @@ public class MainApplication {
 
 		//sandbox
         /*
-        Statement statement = ScheduleService.getInstance().getRandomStatement();
-
-        System.out.println( statement);
-        System.out.println( statement.getHeader());
-        System.out.println( statement.getDetails());
         */
     }
 
