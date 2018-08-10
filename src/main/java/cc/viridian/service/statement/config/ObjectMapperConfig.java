@@ -16,6 +16,8 @@ public class ObjectMapperConfig {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.disable(SerializationFeature.WRAP_EXCEPTIONS);
+        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
         log.info("creating custom ObjectMapper disabling write_dates_as_timestamps");
         return objectMapper;

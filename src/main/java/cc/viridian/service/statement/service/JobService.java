@@ -71,6 +71,15 @@ public class JobService {
 
         }
 
+        if (data.getAdapterType().equalsIgnoreCase("sender")) {
+            switch (data.getErrorCode()) {
+                case "":
+                    statementJob = completeSenderUpdateJob(statementJob, data);
+                    break;
+            }
+
+        }
+
         //now, update the record in the database
         statementJobRepository.updateStatementJob(statementJob);
 
@@ -118,4 +127,17 @@ public class JobService {
         statementJob.setCorebankErrorDesc(data.getErrorDesc());
         return statementJob;
     }
+
+    //in progress
+    public StatementJob completeSenderUpdateJob(StatementJob statementJob, UpdateJobTemplate data) {
+        statementJob.setStatus("CLOSE");
+        if (statementJob.getTimeEndJob() == null) {
+            statementJob.setTimeEndJob(data.getLocalDateTime());
+        }
+        statementJob.setSenderErrorCode("ok");
+        statementJob.setSenderErrorDesc(data.getErrorDesc());
+        return statementJob;
+    }
+
+
 }

@@ -2,6 +2,7 @@ package cc.viridian.service.statement.config;
 
 import cc.viridian.service.statement.model.JobTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@Slf4j
 public class StatementJobProducerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
@@ -48,6 +50,7 @@ public class StatementJobProducerConfig {
     public KafkaTemplate<String, JobTemplate> kafkaTemplate() {
         KafkaTemplate<String, JobTemplate> template = new KafkaTemplate<>(producerFactory());
         template.setDefaultTopic(topicStatementJobs);
+        log.info("creating kafka producer for topic: " + topicStatementJobs);
         return template;
     }
 }
