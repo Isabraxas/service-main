@@ -32,7 +32,7 @@ public class UpdateJobListener {
         log.info(data.getErrorDesc());
         log.info(data.getId().toString());
         log.info(data.getLocalDateTime().toString());
-        log.info(data.getRetryNumber().toString());
+        log.info(data.getShouldTryAgain().toString());
 
         log.info("key:" + headers.get("kafka_receivedMessageKey"));
         log.info("partition:" + headers.get("kafka_receivedPartitionId"));
