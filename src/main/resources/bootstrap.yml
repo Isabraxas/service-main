@@ -5,6 +5,6 @@ spring:
     active: default
   cloud:
     config:
-      uri2: http://electron.viridian.cc:9002
-      uri: http://localhost:7015
+      uri: http://desarrollo.viridian.cc:7000
+      uri2: http://localhost:7015
       profile: default

@@ -1,24 +1,23 @@
-eureka:
-  instance:
-    appname: statement
-    hostname: localhost
-
-server:
-  port: 7010
-
-spring:
-  kafka:
-    bootstrap-servers: 142.93.60.121:9092
-
-topic:
-  statement:
-    jobs: jobs2
-    update: update3
-
-
-database:
-  jdbc-driver: org.postgresql.Driver
-  url2: jdbc:postgresql://localhost:5432/statement
-  url: jdbc:postgresql://142.93.60.121:5432/statement
-  user: postgres
-  password: sample
+#eureka:
+#  instance:
+#    appname: statement
+#    hostname: localhost
+#
+#server:
+#  port: 7010
+#
+#spring:
+#  kafka:
+#    bootstrap-servers: kafka.lab.viridian.cc:9092
+#
+#topic:
+#  statement:
+#    jobs: feronti-jobs1
+#    update: feronti-updates1
+#
+#
+#database:
+#  jdbc-driver: org.postgresql.Driver
+#  url: jdbc:postgresql://postgres.lab.viridian.cc:5432/viridian
+#  user: viridian
+#  password: sesamo

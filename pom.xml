@@ -5,7 +5,7 @@
 
 	<groupId>com.viridian.service</groupId>
 	<artifactId>statement</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<packaging>jar</packaging>
 
 	<name>statement</name>
@@ -54,6 +54,7 @@
             <artifactId>cayenne-server</artifactId>
             <version>${cayenne.version}</version>
         </dependency>
+
         <!--  For java.time.* types you need to use this dependency-->
         <dependency>
             <groupId>org.apache.cayenne</groupId>
@@ -79,6 +80,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<outputDirectory>${project.basedir}/dist</outputDirectory>
+                    <executable>true</executable>
 				</configuration>
 			</plugin>
 		</plugins>
