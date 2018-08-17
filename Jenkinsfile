@@ -26,6 +26,10 @@ node {
          //junit '**/target/surefire-reports/TEST-*.xml'
     }
     stage("deploy") {
+
+        slackSend color: 'good', message: ':computer: *' + artifactName + '* has been built _successfully_ '
+
         sh '/var/lib/jenkins/viridian/deploy-' + repoName + '.sh'
+
     }
 }
