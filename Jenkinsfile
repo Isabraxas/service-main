@@ -27,7 +27,21 @@ node {
     }
     stage("deploy") {
 
-        //slackSend color: 'good', message: ':computer: *' + artifactName + '* has been built _successfully_ '
+        def committerEmail = sh (
+            script: 'git --no-pager show -s --format=\'%ae\'',
+            returnStdout: true
+        ).trim()
+
+        def message = { "attachments": [ {
+            "fallback": "Required plain-text summary of the attachment.",
+            "color": "#36a64f",
+            "author_name": "juan at gmail",
+            "title": "provider-corebank-0.1.41.jar",
+            '"text": "has been built _successfully_,
+            } ] }
+
+        slackSend message
+        //slackSend color: 'good', message: ':computer: *' + artifactName + "* has been built _successfully_ \n"
 
         sh '/var/lib/jenkins/viridian/deploy-' + repoName + '.sh'
 
