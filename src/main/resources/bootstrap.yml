@@ -1,10 +1,9 @@
 spring:
   application:
-    name: statement
+    name: statementmain
   profiles:
     active: default
   cloud:
     config:
       uri: http://desarrollo.viridian.cc:7000
-      uri2: http://localhost:7015
       profile: default
