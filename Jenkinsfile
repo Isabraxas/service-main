@@ -32,13 +32,13 @@ node {
             returnStdout: true
         ).trim()
 
-        def message = { "attachments": [ {
+        def message = ' { "attachments": [ {
             "fallback": "Required plain-text summary of the attachment.",
             "color": "#36a64f",
-            "author_name": "juan at gmail",
+            "author_name": "' + committerEmail + '",
             "title": "provider-corebank-0.1.41.jar",
             '"text": "has been built _successfully_,
-            } ] }
+            } ] } '
 
         slackSend message
         //slackSend color: 'good', message: ':computer: *' + artifactName + "* has been built _successfully_ \n"
