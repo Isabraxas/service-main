@@ -37,7 +37,7 @@ node {
             + ' "color": "#36a64f", '
             + ' "author_name": "' + committerEmail + '", '
             + ' "title": "provider-corebank-0.1.41.jar", '
-            + ' '"text": "has been built _successfully_, '
+            + ' '"text": "has been built _successfully_", '
             + ' } ] } '
 
         slackSend message
