@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.viridian.service</groupId>
-	<artifactId>statement</artifactId>
+	<artifactId>service-statement-main</artifactId>
 	<version>0.1.SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>statement</name>
+	<name>service-statement-main</name>
 	<description>Bank statements project for Spring Boot</description>
 
 	<properties>
