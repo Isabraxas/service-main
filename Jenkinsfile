@@ -34,7 +34,7 @@ node {
             ).trim()
 
             slackSend color: 'good',
-                message: ':computer: *' + artifactName + "* has been built _successfully_ \n" + committerEmail
+                message: artifactName + "* has been built _successfully_ \n" + committerEmail
 
             sh '/var/lib/jenkins/viridian/deploy-' + repoName + '.sh'
         }
