@@ -19,18 +19,19 @@ node {
         }
     }
     stage('test') {
-         dir(repoName) {
-             sh "mvn -Dbuild.number=${BUILD_NUMBER} -Dmaven.test.failure.ignore package"
-             archiveArtifacts "target/" + artifactName
-         }
+        dir(repoName) {
+            sh "mvn -Dbuild.number=${BUILD_NUMBER} -Dmaven.test.failure.ignore package"
+            archiveArtifacts "target/" + artifactName
+        }
          //junit '**/target/surefire-reports/TEST-*.xml'
     }
     stage("deploy") {
 
-        def committerEmail = sh (
-            script: 'git --no-pager show -s --format=\'%ae\'',
-            returnStdout: true
-        ).trim()
+        dir(repoName) {
+            def committerEmail = sh (
+                script: 'git --no-pager show -s --format=\'%ae\'',
+                returnStdout: true
+            ).trim()
 
         def message = ' { "attachments": [ { '
             + ' "fallback": "Required plain-text summary of the attachment.", '
@@ -40,10 +41,10 @@ node {
             + ' "text": "has been built _successfully_", '
             + ' } ] } '
 
-        slackSend message
-        //slackSend color: 'good', message: ':computer: *' + artifactName + "* has been built _successfully_ \n"
+            slackSend message
+            //slackSend color: 'good', message: ':computer: *' + artifactName + "* has been built _successfully_ \n"
 
-        sh '/var/lib/jenkins/viridian/deploy-' + repoName + '.sh'
-
+            sh '/var/lib/jenkins/viridian/deploy-' + repoName + '.sh'
+        }
     }
 }
