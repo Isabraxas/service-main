@@ -29,4 +29,9 @@ public class StatementController {
         return statementService.listAccounts(start, length);
     }
 
+    @RequestMapping("/account/monthly")
+    public ListAccountsResponse listAccountsMonthly(){
+
+        return statementService.listAccountsMonthly();
+    }
 }

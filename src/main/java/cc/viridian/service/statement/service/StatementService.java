@@ -34,4 +34,7 @@ public class StatementService {
         return statementMainRepository.listAccounts(start, length);
     }
 
+    public ListAccountsResponse listAccountsMonthly(){
+        return statementMainRepository.listAccountsFilterByMonthlyFrequency();
+    }
 }

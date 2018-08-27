@@ -78,6 +78,27 @@ public class StatementMainRepository {
         return response;
     }
 
+    public ListAccountsResponse listAccountsFilterByMonthlyFrequency(){
+        ObjectContext context = mainServerRuntime.newContext();
+
+        List<StatementMain> accounts = ObjectSelect.query(StatementMain.class)
+                                                   .where(StatementMain.FREQUENCY.eq("MONTHLY"))
+                                                   .select(context);
+        List<AccountsRegistered> accountsRegistered = new ArrayList<>();
+
+        Iterator<StatementMain> it = accounts.iterator();
+        while (it.hasNext()){
+            accountsRegistered.add(new AccountsRegistered(it.next()));
+        }
+
+        ListAccountsResponse response = new ListAccountsResponse();
+        response.setData(accountsRegistered);
+
+        response.setRecordsFiltered(countAllAccounts());
+        response.setRecordsTotal(countAllAccounts());
+        return response;
+    }
+
     public Long countAllAccounts ()
     {
         ObjectContext context = mainServerRuntime.newContext();

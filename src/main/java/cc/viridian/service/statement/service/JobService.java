@@ -1,5 +1,6 @@
 package cc.viridian.service.statement.service;
 
+import cc.viridian.service.statement.model.AccountsRegistered;
 import cc.viridian.service.statement.model.JobTemplate;
 import cc.viridian.service.statement.model.StatementJobModel;
 import cc.viridian.service.statement.model.UpdateJobTemplate;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
+import java.time.Month;
 
 @Slf4j
 @NoArgsConstructor
@@ -84,6 +87,30 @@ public class JobService {
         statementJobRepository.updateStatementJob(statementJob);
 
         return new StatementJobModel(statementJob);
+    }
+
+    public String processMonthlyAccounts(ListAccountsResponse listAccountsResponse){
+        /* recibir lista de accounts que coincidan con el criterio de MONTHLY
+         * por cada account en la lista registrar su job en la BD y mandar a kafka */
+        for (AccountsRegistered acc : listAccountsResponse.getData()){
+            RegisterJobPost body = new RegisterJobPost();
+            body.setAccount(acc.getAccountCode());
+            body.setCurrency(acc.getAccountCurrency());
+            body.setType(acc.getAccountType());
+            body.setCustomerCode(acc.getCustomerCode());
+            body.setRecipient(acc.getRecipient());
+            body.setFrequency(acc.getFrequency());
+            body.setDateFrom(LocalDate.now());
+            body.setDateTo(LocalDate.of(2018,Month.JULY,28));
+            body.setCorebankAdapter("test1");
+            body.setFormatAdapter("test2");
+            body.setSendAdapter("test3");
+            StatementJob statementJob = statementJobRepository.registerSingleJob(body);
+
+            JobTemplate jobTemplate = new JobTemplate(statementJob);
+            statementJobProducer.send(""+jobTemplate.getId(),jobTemplate);
+        }
+        return "processed monthly record";
     }
 
     //in progress
