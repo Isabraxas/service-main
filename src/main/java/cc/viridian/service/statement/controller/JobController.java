@@ -1,6 +1,7 @@
 package cc.viridian.service.statement.controller;
 
 import cc.viridian.service.statement.model.StatementJobModel;
+import cc.viridian.service.statement.payload.ListAccountsResponse;
 import cc.viridian.service.statement.payload.ListJobsResponse;
 import cc.viridian.service.statement.payload.RegisterJobPost;
 import cc.viridian.service.statement.service.JobService;
@@ -39,5 +40,10 @@ public class JobController {
         return jobService.registerSingleJob(body);
     }
 
-
+    @RequestMapping(method = RequestMethod.POST, value = "/job/process")
+    @ResponseBody
+    public String processMonthly(
+        @RequestBody ListAccountsResponse list){
+        return jobService.processMonthlyAccounts(list);
+    }
 }
