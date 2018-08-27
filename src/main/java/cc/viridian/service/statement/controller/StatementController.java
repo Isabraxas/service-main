@@ -29,4 +29,11 @@ public class StatementController {
         return statementService.listAccounts(start, length);
     }
 
+    @RequestMapping("/account/monthly")
+    public ListAccountsResponse listAccountsMonthly(
+        @RequestParam(value= "start", required = false, defaultValue = "0") Integer start,
+        @RequestParam(value= "length", required = false, defaultValue = "25") Integer length){
+
+        return statementService.listAccountsMonthly();
+    }
 }
