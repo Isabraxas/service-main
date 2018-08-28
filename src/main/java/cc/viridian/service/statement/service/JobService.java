@@ -102,9 +102,9 @@ public class JobService {
             body.setFrequency(acc.getFrequency());
             body.setDateFrom(LocalDate.now());
             body.setDateTo(LocalDate.of(2018,Month.JULY,28));
-            body.setCorebankAdapter("test1");
-            body.setFormatAdapter("test2");
-            body.setSendAdapter("test3");
+            body.setCorebankAdapter("SAMPLEBANK");
+            body.setFormatAdapter("csv");
+            body.setSendAdapter("email");
             StatementJob statementJob = statementJobRepository.registerSingleJob(body);
 
             JobTemplate jobTemplate = new JobTemplate(statementJob);
