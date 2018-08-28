@@ -49,7 +49,7 @@ public class JobTemplate {
         this.frequency = job.getFrequency();
         this.dateFrom = job.getProcessDateFrom();
         this.dateTo = job.getProcessDateTo();
-        this.attemptNumber = job.getCorebankRetries() +1;
+        this.attemptNumber = job.getCorebankRetries() + 1;
     }
 
     @Deprecated //not used
@@ -69,7 +69,7 @@ public class JobTemplate {
         this.frequency = job.getFrequency();
         this.dateFrom = job.getDateFrom();
         this.dateTo = job.getDateTo();
-        this.attemptNumber = job.getCorebankRetries() +1;
+        this.attemptNumber = job.getCorebankRetries() + 1;
     }
 
     @Override

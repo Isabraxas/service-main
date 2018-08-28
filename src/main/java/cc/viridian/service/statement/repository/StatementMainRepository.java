@@ -26,7 +26,7 @@ public class StatementMainRepository {
         this.mainServerRuntime = mainServerRuntime;
     }
 
-    public StatementMain registerNewAccount(RegisterAccountPost body) {
+    public StatementMain registerNewAccount(final RegisterAccountPost body) {
         ObjectContext context = mainServerRuntime.newContext();
         StatementMain statementMain = context.newObject(StatementMain.class);
 
@@ -50,10 +50,9 @@ public class StatementMainRepository {
         context.commitChanges();
 
         return statementMain;
-
     }
 
-    public ListAccountsResponse listAccounts(Integer start, Integer length) {
+    public ListAccountsResponse listAccounts(final Integer start, final Integer length) {
         ObjectContext context = mainServerRuntime.newContext();
 
         //Select all statement
@@ -66,19 +65,19 @@ public class StatementMainRepository {
 
         Iterator<StatementMain> it = accounts.iterator();
         while (it.hasNext()) {
-            accountsRegistered.add(new AccountsRegistered(it.next()) );
+            accountsRegistered.add(new AccountsRegistered(it.next()));
         }
 
         ListAccountsResponse response = new ListAccountsResponse();
         response.setData(accountsRegistered);
 
-        response.setRecordsFiltered( countAllAccounts() );
+        response.setRecordsFiltered(countAllAccounts());
         response.setRecordsTotal(countAllAccounts());
 
         return response;
     }
 
-    public ListAccountsResponse listAccountsFilterByMonthlyFrequency(){
+    public ListAccountsResponse listAccountsFilterByMonthlyFrequency() {
         ObjectContext context = mainServerRuntime.newContext();
 
         List<StatementMain> accounts = ObjectSelect.query(StatementMain.class)
@@ -87,7 +86,7 @@ public class StatementMainRepository {
         List<AccountsRegistered> accountsRegistered = new ArrayList<>();
 
         Iterator<StatementMain> it = accounts.iterator();
-        while (it.hasNext()){
+        while (it.hasNext()) {
             accountsRegistered.add(new AccountsRegistered(it.next()));
         }
 
@@ -99,8 +98,7 @@ public class StatementMainRepository {
         return response;
     }
 
-    public Long countAllAccounts ()
-    {
+    public Long countAllAccounts() {
         ObjectContext context = mainServerRuntime.newContext();
 
         //Select count(*) from statement_main
@@ -109,5 +107,4 @@ public class StatementMainRepository {
 
         return result.get(0);
     }
-
 }

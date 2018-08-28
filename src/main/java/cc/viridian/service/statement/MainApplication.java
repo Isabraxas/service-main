@@ -11,15 +11,14 @@ import java.time.ZoneId;
 @Slf4j
 public class MainApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(MainApplication.class, args);
+    public static void main(final String[] args) {
+        SpringApplication.run(MainApplication.class, args);
 
         ZoneId defaultZoneId = ZoneId.systemDefault();
         log.info("System Default TimeZone : " + defaultZoneId);
 
-		//sandbox
+        //sandbox
         /*
         */
     }
-
 }

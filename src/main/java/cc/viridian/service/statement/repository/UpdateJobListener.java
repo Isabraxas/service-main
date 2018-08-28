@@ -21,8 +21,8 @@ public class UpdateJobListener {
     private JobService jobService;
 
     @KafkaListener(topics = "${topic.statement.update}")
-    public void receive(@Payload UpdateJobTemplate data,
-                        @Headers MessageHeaders headers) {
+    public void receive(@Payload final UpdateJobTemplate data,
+                        @Headers final MessageHeaders headers) {
         log.info("received UpdateJob Message:");
 
         log.info(data.getAccount());

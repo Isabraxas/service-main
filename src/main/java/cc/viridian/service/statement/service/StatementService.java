@@ -22,19 +22,16 @@ public class StatementService {
         this.statementMainRepository = statementMainRepository;
     }
 
-
-    public AccountsRegistered registerNewAccount(RegisterAccountPost body) {
+    public AccountsRegistered registerNewAccount(final RegisterAccountPost body) {
         StatementMain account = statementMainRepository.registerNewAccount(body);
         return new AccountsRegistered(account);
     }
 
-
-    public ListAccountsResponse listAccounts(Integer start, Integer length)
-    {
+    public ListAccountsResponse listAccounts(final Integer start, final Integer length) {
         return statementMainRepository.listAccounts(start, length);
     }
 
-    public ListAccountsResponse listAccountsMonthly(){
+    public ListAccountsResponse listAccountsMonthly() {
         return statementMainRepository.listAccountsFilterByMonthlyFrequency();
     }
 }

@@ -4,7 +4,9 @@ import cc.viridian.service.statement.model.AccountsRegistered;
 import cc.viridian.service.statement.model.JobTemplate;
 import cc.viridian.service.statement.model.StatementJobModel;
 import cc.viridian.service.statement.model.UpdateJobTemplate;
-import cc.viridian.service.statement.payload.*;
+import cc.viridian.service.statement.payload.ListAccountsResponse;
+import cc.viridian.service.statement.payload.ListJobsResponse;
+import cc.viridian.service.statement.payload.RegisterJobPost;
 import cc.viridian.service.statement.persistence.StatementJob;
 import cc.viridian.service.statement.repository.StatementJobProducer;
 import cc.viridian.service.statement.repository.StatementJobRepository;
@@ -13,9 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.YearMonth;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,13 +34,11 @@ public class JobService {
         this.statementJobRepository = statementJobRepository;
     }
 
-    public ListJobsResponse listJobs(Integer start, Integer length)
-    {
+    public ListJobsResponse listJobs(final Integer start, final Integer length) {
         return statementJobRepository.listJobs(start, length);
     }
 
-
-    public StatementJobModel registerSingleJob(RegisterJobPost body) {
+    public StatementJobModel registerSingleJob(final RegisterJobPost body) {
 
         StatementJob statementJob = statementJobRepository.registerSingleJob(body);
 
@@ -53,7 +51,7 @@ public class JobService {
         return new StatementJobModel(statementJob);
     }
 
-    public StatementJobModel updateJob(UpdateJobTemplate data) {
+    public StatementJobModel updateJob(final UpdateJobTemplate data) {
         //read the statementJob from database
         StatementJob statementJob = statementJobRepository.findById(data.getId());
 
@@ -75,7 +73,6 @@ public class JobService {
                     statementJob = retryLaterUpdateJob(statementJob, data);
                     break;
             }
-
         }
 
         if (data.getAdapterType().equalsIgnoreCase("sender")) {
@@ -84,7 +81,6 @@ public class JobService {
                     statementJob = completeSenderUpdateJob(statementJob, data);
                     break;
             }
-
         }
 
         //now, update the record in the database
@@ -93,12 +89,12 @@ public class JobService {
         return new StatementJobModel(statementJob);
     }
 
-    public Map<String,Object> processMonthlyAccounts(ListAccountsResponse listAccountsResponse){
+    public Map<String, Object> processMonthlyAccounts(final ListAccountsResponse listAccountsResponse) {
         /* recibir lista de accounts que coincidan con el criterio de MONTHLY
          * por cada account en la lista registrar su job en la BD y mandar a kafka */
         int records = listAccountsResponse.getData().size();
         LocalDate nowDate = LocalDate.now();
-        for (AccountsRegistered acc : listAccountsResponse.getData()){
+        for (AccountsRegistered acc : listAccountsResponse.getData()) {
             RegisterJobPost body = new RegisterJobPost();
             body.setAccount(acc.getAccountCode());
             body.setCurrency(acc.getAccountCurrency());
@@ -106,25 +102,28 @@ public class JobService {
             body.setCustomerCode(acc.getCustomerCode());
             body.setRecipient(acc.getRecipient());
             body.setFrequency(acc.getFrequency());
-            body.setDateFrom(LocalDate.of(nowDate.getYear(),calculatePreviousMonth(nowDate),1));    // primer dia del mes
-            body.setDateTo(LocalDate.of(nowDate.getYear(),calculatePreviousMonth(nowDate),calculateLastDayOfMonth(nowDate)));
+            body.setDateFrom(
+                LocalDate.of(nowDate.getYear(), calculatePreviousMonth(nowDate), 1));    // primer dia del mes
+            body.setDateTo(
+                LocalDate.of(nowDate.getYear(), calculatePreviousMonth(nowDate), calculateLastDayOfMonth(nowDate)));
             body.setCorebankAdapter(acc.getCorebankAdapter());
             body.setFormatAdapter(acc.getFormatAdapter());
             body.setSendAdapter(acc.getSendAdapter());
             StatementJob statementJob = statementJobRepository.registerSingleJob(body);
 
             JobTemplate jobTemplate = new JobTemplate(statementJob);
-            statementJobProducer.send(""+jobTemplate.getId(),jobTemplate);
+            statementJobProducer.send("" + jobTemplate.getId(), jobTemplate);
         }
         Map<String, Object> res = new HashMap<>();
-        res.put("recordsProcessed",records);
-        res.put("dateFrom",LocalDate.of(nowDate.getYear(),calculatePreviousMonth(nowDate),1));
-        res.put("dateTo",LocalDate.of(nowDate.getYear(),calculatePreviousMonth(nowDate),calculateLastDayOfMonth(nowDate)));
+        res.put("recordsProcessed", records);
+        res.put("dateFrom", LocalDate.of(nowDate.getYear(), calculatePreviousMonth(nowDate), 1));
+        res.put("dateTo",
+                LocalDate.of(nowDate.getYear(), calculatePreviousMonth(nowDate), calculateLastDayOfMonth(nowDate)));
         return res;
     }
 
     //in progress
-    public StatementJob inProgressUpdateJob(StatementJob statementJob, UpdateJobTemplate data) {
+    public StatementJob inProgressUpdateJob(final StatementJob statementJob, final UpdateJobTemplate data) {
         statementJob.setStatus("IN PROGRESS");
         if (statementJob.getTimeStartJob() == null) {
             statementJob.setTimeStartJob(data.getLocalDateTime());
@@ -135,24 +134,24 @@ public class JobService {
     }
 
     //completed
-    public StatementJob completeUpdateJob(StatementJob statementJob, UpdateJobTemplate data) {
+    public StatementJob completeUpdateJob(final StatementJob statementJob, final UpdateJobTemplate data) {
         return statementJob;
     }
 
     //job processed with error but should retry
-    public StatementJob retryLaterUpdateJob(StatementJob statementJob, UpdateJobTemplate data) {
+    public StatementJob retryLaterUpdateJob(final StatementJob statementJob, final UpdateJobTemplate data) {
         statementJob.setStatus("WITH ERROR");
         if (statementJob.getTimeStartJob() == null) {
             statementJob.setTimeStartJob(data.getLocalDateTime());
         }
         statementJob.setCorebankErrorCode(data.getErrorCode());
         statementJob.setCorebankErrorDesc(data.getErrorDesc());
-        statementJob.setCorebankRetries(statementJob.getCorebankRetries()+1);
+        statementJob.setCorebankRetries(statementJob.getCorebankRetries() + 1);
         return statementJob;
     }
 
     //job processed with error but shouldn't retry because state is final and unrecoverable
-    public StatementJob completeWithErrorUpdateJob(StatementJob statementJob, UpdateJobTemplate data) {
+    public StatementJob completeWithErrorUpdateJob(final StatementJob statementJob, final UpdateJobTemplate data) {
         statementJob.setStatus("CLOSE ERROR");
         if (statementJob.getTimeStartJob() == null) {
             statementJob.setTimeStartJob(data.getLocalDateTime());
@@ -166,7 +165,7 @@ public class JobService {
     }
 
     //in progress
-    public StatementJob completeSenderUpdateJob(StatementJob statementJob, UpdateJobTemplate data) {
+    public StatementJob completeSenderUpdateJob(final StatementJob statementJob, final UpdateJobTemplate data) {
         statementJob.setStatus("CLOSE");
         if (statementJob.getTimeEndJob() == null) {
             statementJob.setTimeEndJob(data.getLocalDateTime());
@@ -177,13 +176,13 @@ public class JobService {
     }
 
     // calculates the previous month number of the provided date
-    private int calculatePreviousMonth(LocalDate localDate){
-        return (localDate.getMonthValue()-1);
+    private int calculatePreviousMonth(final LocalDate localDate) {
+        return (localDate.getMonthValue() - 1);
     }
 
     // calculates the last day of the month of the provided date
-    private int calculateLastDayOfMonth(LocalDate date){
-        YearMonth month = YearMonth.of(date.getYear(),date.getMonth());
+    private int calculateLastDayOfMonth(final LocalDate date) {
+        YearMonth month = YearMonth.of(date.getYear(), date.getMonth());
         return month.atEndOfMonth().getDayOfMonth();
     }
 }

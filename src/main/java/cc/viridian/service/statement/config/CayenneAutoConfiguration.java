@@ -33,16 +33,15 @@ public class CayenneAutoConfiguration {
         public ServerRuntime mainServerRuntime() {
 
             ServerRuntime serverRuntime = ServerRuntime.builder()
-                .addConfig("persistence/cayenne-statement.xml")
-                .jdbcDriver( jdbcDriver)
-                .url(url)
-                .user(user)
-                .password(password)
-                .build();
+                                                       .addConfig("persistence/cayenne-statement.xml")
+                                                       .jdbcDriver(jdbcDriver)
+                                                       .url(url)
+                                                       .user(user)
+                                                       .password(password)
+                                                       .build();
 
             log.info("connecting to database: " + url);
             return serverRuntime;
         }
-
     }
 }

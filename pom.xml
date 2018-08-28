@@ -55,7 +55,6 @@
             <version>${cayenne.version}</version>
         </dependency>
 
-        <!--  For java.time.* types you need to use this dependency-->
         <dependency>
             <groupId>org.apache.cayenne</groupId>
             <artifactId>cayenne-java8</artifactId>
@@ -103,6 +102,22 @@
             <name>viridian-releases</name>
             <url>http://desarrollo.viridian.cc:8081/artifactory/libs-release</url>
 		</repository>
-
 	</repositories>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>3.0.0</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>checkstyle</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
