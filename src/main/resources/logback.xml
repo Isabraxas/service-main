@@ -5,5 +5,6 @@
     <logger name="Refreshing org.springframework.context" level="WARN"/>
     <logger name="org.apache.kafka.clients.producer.ProducerConfig" level="WARN"/>
     <logger name="org.apache.kafka.clients.consumer.ConsumerConfig" level="WARN"/>
+    <logger name="org.apache.cayenne.log.JdbcEventLogger" level="WARN"/>
     <logger name="cc.viridian" level="DEBUG"/>
 </configuration>
