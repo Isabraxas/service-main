@@ -7,6 +7,7 @@ import cc.viridian.service.statement.payload.RegisterJobPost;
 import cc.viridian.service.statement.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -42,7 +43,7 @@ public class JobController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/job/process")
     @ResponseBody
-    public String processMonthly(
+    public Map<String, Object> processMonthly(
         @RequestBody ListAccountsResponse list){
         return jobService.processMonthlyAccounts(list);
     }
