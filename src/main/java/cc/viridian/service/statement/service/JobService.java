@@ -185,4 +185,11 @@ public class JobService {
         YearMonth month = YearMonth.of(date.getYear(), date.getMonth());
         return month.atEndOfMonth().getDayOfMonth();
     }
+
+    public Map<String, Object> processTruncate() {
+        Map<String, Object> response = new HashMap<>();
+
+        statementJobRepository.truncateJobs();
+        return response;
+    }
 }

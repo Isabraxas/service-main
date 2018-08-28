@@ -6,9 +6,11 @@ import cc.viridian.service.statement.payload.RegisterJobPost;
 import cc.viridian.service.statement.persistence.StatementJob;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.cayenne.ObjectContext;
+import org.apache.cayenne.QueryResponse;
 import org.apache.cayenne.configuration.server.ServerRuntime;
 import org.apache.cayenne.query.EJBQLQuery;
 import org.apache.cayenne.query.ObjectSelect;
+import org.apache.cayenne.query.SQLTemplate;
 import org.apache.cayenne.query.SelectById;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -117,5 +119,13 @@ public class StatementJobRepository {
         context.commitChanges();
 
         return statementJob;
+    }
+
+    public void truncateJobs() {
+        ObjectContext context = mainServerRuntime.newContext();
+
+        SQLTemplate truncateQuery = new SQLTemplate(StatementJob.class, "truncate table STATEMENT_JOB");
+        QueryResponse response = context.performGenericQuery(truncateQuery);
+
     }
 }
