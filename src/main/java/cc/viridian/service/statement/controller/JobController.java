@@ -47,9 +47,8 @@ public class JobController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/job/process")
     @ResponseBody
-    public Map<String, Object> processMonthly(
-        @RequestBody final ListAccountsResponse list) {
-        return jobService.processMonthlyAccounts(list);
+    public Map<String, Object> processMonthly() {
+        return jobService.processMonthlyAccounts();
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/job/truncate")

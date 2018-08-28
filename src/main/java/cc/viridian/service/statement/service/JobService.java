@@ -25,6 +25,9 @@ import java.util.Map;
 public class JobService {
 
     @Autowired
+    StatementService statementService;
+
+    @Autowired
     StatementJobProducer statementJobProducer;
 
     private StatementJobRepository statementJobRepository;
@@ -89,9 +92,12 @@ public class JobService {
         return new StatementJobModel(statementJob);
     }
 
-    public Map<String, Object> processMonthlyAccounts(final ListAccountsResponse listAccountsResponse) {
-        /* recibir lista de accounts que coincidan con el criterio de MONTHLY
-         * por cada account en la lista registrar su job en la BD y mandar a kafka */
+    /**
+     * Obtains a list of Accounts who match the "MONTHLY" criteria and then registers and process the list to kafka
+     * @return a Map Object containing the dates from and to, and the number of records processed
+     */
+    public Map<String, Object> processMonthlyAccounts() {
+        ListAccountsResponse listAccountsResponse = statementService.listAccountsMonthly();
         int records = listAccountsResponse.getData().size();
         LocalDate nowDate = LocalDate.now();
         for (AccountsRegistered acc : listAccountsResponse.getData()) {
