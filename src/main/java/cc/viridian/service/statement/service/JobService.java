@@ -92,9 +92,11 @@ public class JobService {
         return new StatementJobModel(statementJob);
     }
 
+    /**
+     * Obtains a list of Accounts who match the "MONTHLY" criteria and then registers and process the list to kafka
+     * @return a Map Object containing the dates from and to, and the number of records processed
+     */
     public Map<String, Object> processMonthlyAccounts() {
-        /* obtener la lista de accounts que coincidan con el criterio de MONTHLY
-         * por cada account en la lista registrar su job en la BD y mandar a kafka */
         ListAccountsResponse listAccountsResponse = statementService.listAccountsMonthly();
         int records = listAccountsResponse.getData().size();
         LocalDate nowDate = LocalDate.now();
