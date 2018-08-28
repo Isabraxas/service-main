@@ -14,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.YearMonth;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @NoArgsConstructor
@@ -89,9 +93,11 @@ public class JobService {
         return new StatementJobModel(statementJob);
     }
 
-    public String processMonthlyAccounts(ListAccountsResponse listAccountsResponse){
+    public Map<String,Object> processMonthlyAccounts(ListAccountsResponse listAccountsResponse){
         /* recibir lista de accounts que coincidan con el criterio de MONTHLY
          * por cada account en la lista registrar su job en la BD y mandar a kafka */
+        int records = listAccountsResponse.getData().size();
+        LocalDate nowDate = LocalDate.now();
         for (AccountsRegistered acc : listAccountsResponse.getData()){
             RegisterJobPost body = new RegisterJobPost();
             body.setAccount(acc.getAccountCode());
@@ -100,8 +106,8 @@ public class JobService {
             body.setCustomerCode(acc.getCustomerCode());
             body.setRecipient(acc.getRecipient());
             body.setFrequency(acc.getFrequency());
-            body.setDateFrom(LocalDate.now());
-            body.setDateTo(LocalDate.of(2018,Month.JULY,28));
+            body.setDateFrom(LocalDate.of(nowDate.getYear(),calculatePreviousMonth(nowDate),1));    // primer dia del mes
+            body.setDateTo(LocalDate.of(nowDate.getYear(),calculatePreviousMonth(nowDate),calculateLastDayOfMonth(nowDate)));
             body.setCorebankAdapter(acc.getCorebankAdapter());
             body.setFormatAdapter(acc.getFormatAdapter());
             body.setSendAdapter(acc.getSendAdapter());
@@ -110,7 +116,11 @@ public class JobService {
             JobTemplate jobTemplate = new JobTemplate(statementJob);
             statementJobProducer.send(""+jobTemplate.getId(),jobTemplate);
         }
-        return "processed monthly record";
+        Map<String, Object> res = new HashMap<>();
+        res.put("recordsProcessed",records);
+        res.put("dateFrom",LocalDate.of(nowDate.getYear(),calculatePreviousMonth(nowDate),1));
+        res.put("dateTo",LocalDate.of(nowDate.getYear(),calculatePreviousMonth(nowDate),calculateLastDayOfMonth(nowDate)));
+        return res;
     }
 
     //in progress
@@ -166,5 +176,14 @@ public class JobService {
         return statementJob;
     }
 
+    // calculates the previous month number of the provided date
+    private int calculatePreviousMonth(LocalDate localDate){
+        return (localDate.getMonthValue()-1);
+    }
 
+    // calculates the last day of the month of the provided date
+    private int calculateLastDayOfMonth(LocalDate date){
+        YearMonth month = YearMonth.of(date.getYear(),date.getMonth());
+        return month.atEndOfMonth().getDayOfMonth();
+    }
 }
