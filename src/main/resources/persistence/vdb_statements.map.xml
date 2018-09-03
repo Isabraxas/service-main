@@ -32,6 +32,7 @@
 		<db-attribute name="BRANCH_CHANNEL" type="VARCHAR" length="60"/>
 		<db-attribute name="DATE" type="CHAR" length="8"/>
 		<db-attribute name="DEBIT_CREDIT" type="CHAR" length="1"/>
+		<db-attribute name="FK_HEADER" type="INTEGER" isMandatory="true"/>
 		<db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
 		<db-attribute name="LOCAL_DATE_TIME" type="TIMESTAMP"/>
 		<db-attribute name="REFERENCE_NUMBER" type="VARCHAR" length="20"/>
@@ -101,21 +102,22 @@
 		<db-attribute name="USR_CREATE" type="VARCHAR" length="40"/>
 		<db-attribute name="USR_MODIFY" type="VARCHAR" length="40"/>
 	</db-entity>
-	<obj-entity name="Format" className="cc.viridian.service.statement.persistence.Format" dbEntityName="FORMAT">
-		<obj-attribute name="attributes" type="java.lang.String" db-attribute-path="ATTRIBUTES"/>
-		<obj-attribute name="name" type="java.lang.String" db-attribute-path="NAME"/>
-		<obj-attribute name="timeCreate" type="java.time.LocalDateTime" db-attribute-path="TIME_CREATE"/>
-		<obj-attribute name="timeModify" type="java.time.LocalDateTime" db-attribute-path="TIME_MODIFY"/>
-		<obj-attribute name="usrCreate" type="java.lang.String" db-attribute-path="USR_CREATE"/>
-		<obj-attribute name="usrModify" type="java.lang.String" db-attribute-path="USR_MODIFY"/>
-	</obj-entity>
-	<obj-entity name="Send" className="cc.viridian.service.statement.persistence.Send" dbEntityName="SEND">
-		<obj-attribute name="attributes" type="java.lang.String" db-attribute-path="ATTRIBUTES"/>
-		<obj-attribute name="name" type="java.lang.String" db-attribute-path="NAME"/>
-		<obj-attribute name="timeCreate" type="java.time.LocalDateTime" db-attribute-path="TIME_CREATE"/>
-		<obj-attribute name="timeModify" type="java.time.LocalDateTime" db-attribute-path="TIME_MODIFY"/>
-		<obj-attribute name="usrCreate" type="java.lang.String" db-attribute-path="USR_CREATE"/>
-		<obj-attribute name="usrModify" type="java.lang.String" db-attribute-path="USR_MODIFY"/>
+	<obj-entity name="StatementDetail" className="cc.viridian.service.statement.persistence.StatementDetail" dbEntityName="STATEMENT_DETAIL">
+		<obj-attribute name="accountCode" type="java.lang.String" db-attribute-path="ACCOUNT_CODE"/>
+		<obj-attribute name="accountCurrency" type="java.lang.String" db-attribute-path="ACCOUNT_CURRENCY"/>
+		<obj-attribute name="accountType" type="java.lang.String" db-attribute-path="ACCOUNT_TYPE"/>
+		<obj-attribute name="amount" type="java.math.BigDecimal" db-attribute-path="AMOUNT"/>
+		<obj-attribute name="annotation" type="java.lang.String" db-attribute-path="ANNOTATION"/>
+		<obj-attribute name="balance" type="java.math.BigDecimal" db-attribute-path="BALANCE"/>
+		<obj-attribute name="branchChannel" type="java.lang.String" db-attribute-path="BRANCH_CHANNEL"/>
+		<obj-attribute name="date" type="java.lang.String" db-attribute-path="DATE"/>
+		<obj-attribute name="debitCredit" type="java.lang.String" db-attribute-path="DEBIT_CREDIT"/>
+		<obj-attribute name="localDateTime" type="java.time.LocalDateTime" db-attribute-path="LOCAL_DATE_TIME"/>
+		<obj-attribute name="referenceNumber" type="java.lang.String" db-attribute-path="REFERENCE_NUMBER"/>
+		<obj-attribute name="secondaryInfo" type="java.lang.String" db-attribute-path="SECONDARY_INFO"/>
+		<obj-attribute name="transactionCode" type="java.lang.String" db-attribute-path="TRANSACTION_CODE"/>
+		<obj-attribute name="transactionDesc" type="java.lang.String" db-attribute-path="TRANSACTION_DESC"/>
+		<obj-attribute name="trnId" type="java.lang.String" db-attribute-path="TRN_ID"/>
 	</obj-entity>
 	<obj-entity name="StatementHeader" className="cc.viridian.service.statement.persistence.StatementHeader" dbEntityName="STATEMENT_HEADER">
 		<obj-attribute name="accountAddress" type="java.lang.String" db-attribute-path="ACCOUNT_ADDRESS"/>
@@ -175,4 +177,12 @@
 		<obj-attribute name="usrCreate" type="java.lang.String" db-attribute-path="USR_CREATE"/>
 		<obj-attribute name="usrModify" type="java.lang.String" db-attribute-path="USR_MODIFY"/>
 	</obj-entity>
+	<db-relationship name="detailHeader" source="STATEMENT_DETAIL" target="STATEMENT_HEADER" toMany="false">
+		<db-attribute-pair source="FK_HEADER" target="ID"/>
+	</db-relationship>
+	<db-relationship name="HeaderDetail" source="STATEMENT_HEADER" target="STATEMENT_DETAIL" toMany="true">
+		<db-attribute-pair source="ID" target="FK_HEADER"/>
+	</db-relationship>
+	<obj-relationship name="detailHeader" source="StatementDetail" target="StatementHeader" deleteRule="Nullify" db-relationship-path="detailHeader"/>
+	<obj-relationship name="headerDetail" source="StatementHeader" target="StatementDetail" deleteRule="Deny" db-relationship-path="HeaderDetail"/>
 </data-map>
