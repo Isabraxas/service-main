@@ -53,6 +53,7 @@
 		<db-attribute name="CUSTOMER_CODE" type="VARCHAR" length="20"/>
 		<db-attribute name="DATE_FROM" type="DATE"/>
 		<db-attribute name="DATE_TO" type="DATE"/>
+		<db-attribute name="FILE_HASH" type="VARCHAR" length="250"/>
 		<db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
 		<db-attribute name="MESSAGE" type="VARCHAR" length="250"/>
 		<db-attribute name="STATEMENT_TITLE" type="VARCHAR" length="60"/>
@@ -131,6 +132,7 @@
 		<obj-attribute name="customerCode" type="java.lang.String" db-attribute-path="CUSTOMER_CODE"/>
 		<obj-attribute name="dateFrom" type="java.time.LocalDate" db-attribute-path="DATE_FROM"/>
 		<obj-attribute name="dateTo" type="java.time.LocalDate" db-attribute-path="DATE_TO"/>
+		<obj-attribute name="fileHash" type="java.lang.String" db-attribute-path="FILE_HASH"/>
 		<obj-attribute name="message" type="java.lang.String" db-attribute-path="MESSAGE"/>
 		<obj-attribute name="statementTitle" type="java.lang.String" db-attribute-path="STATEMENT_TITLE"/>
 	</obj-entity>
@@ -183,6 +185,5 @@
 	<db-relationship name="HeaderDetail" source="STATEMENT_HEADER" target="STATEMENT_DETAIL" toMany="true">
 		<db-attribute-pair source="ID" target="FK_HEADER"/>
 	</db-relationship>
-	<obj-relationship name="detailHeader" source="StatementDetail" target="StatementHeader" deleteRule="Nullify" db-relationship-path="detailHeader"/>
 	<obj-relationship name="headerDetail" source="StatementHeader" target="StatementDetail" deleteRule="Deny" db-relationship-path="HeaderDetail"/>
 </data-map>
