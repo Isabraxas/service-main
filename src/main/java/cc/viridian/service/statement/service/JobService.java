@@ -1,5 +1,6 @@
 package cc.viridian.service.statement.service;
 
+import cc.viridian.provider.payload.ResponseErrorCode;
 import cc.viridian.service.statement.model.AccountsRegistered;
 import cc.viridian.service.statement.model.JobTemplate;
 import cc.viridian.service.statement.model.StatementJobModel;
@@ -32,6 +33,14 @@ public class JobService {
 
     private StatementJobRepository statementJobRepository;
 
+    private enum StatusCode {
+        NEW,
+        IN_PROGRESS,
+        WITH_ERROR,
+        SLEEPING,
+        COMPLETED
+    };
+
     @Autowired
     public JobService(StatementJobRepository statementJobRepository) {
         this.statementJobRepository = statementJobRepository;
@@ -54,52 +63,100 @@ public class JobService {
         return new StatementJobModel(statementJob);
     }
 
-    public StatementJobModel updateJob(final UpdateJobTemplate data) {
+    public StatementJob updateJobCorebank(final String errorCode, final UpdateJobTemplate updateJob) {
         //read the statementJob from database
-        StatementJob statementJob = statementJobRepository.findById(data.getId());
+        StatementJob statementJob = statementJobRepository.findById(updateJob.getId());
 
-        if (data.getAdapterType().equalsIgnoreCase("corebank")) {
-            switch (data.getErrorCode()) {
-                case "":
-                case "SUCCESS":
-                    statementJob = inProgressUpdateJob(statementJob, data);
-                    break;
-                case "invalid-account":
-                    statementJob = completeWithErrorUpdateJob(statementJob, data);
-                    break;
-                case "invalid-adapter":
-                    statementJob = completeWithErrorUpdateJob(statementJob, data);
-                    break;
-                case "network-error":
-                    statementJob = retryLaterUpdateJob(statementJob, data);
-                    break;
-                case "database-error":
-                    statementJob = retryLaterUpdateJob(statementJob, data);
-                    break;
-            }
+        //update startJob time if it is null
+        if (statementJob.getTimeStartJob() == null) {
+            statementJob.setTimeStartJob(updateJob.getLocalDateTime());
         }
 
-        if (data.getAdapterType().equalsIgnoreCase("formatter")) {
-            switch (data.getErrorCode()) {
-                case "":
-                case "SUCCESS":
-                    statementJob = inProgressUpdateJob(statementJob, data);
-                    break;
-            }
-        }
+        statementJob.setCorebankErrorCode(errorCode);
+        statementJob.setCorebankErrorDesc(updateJob.getErrorDesc());
 
-        if (data.getAdapterType().equalsIgnoreCase("sender")) {
-            switch (data.getErrorCode()) {
-                case "SUCCESS":
-                    statementJob = completeSenderUpdateJob(statementJob, data);
-                    break;
+        if (ResponseErrorCode.SUCCESS.name().equals(errorCode)) {
+            statementJob.setStatus(StatusCode.IN_PROGRESS.name());
+        } else {
+            statementJob.setStatus(StatusCode.WITH_ERROR.name());
+            if (statementJob.getTimeEndJob() == null) {
+                statementJob.setTimeEndJob(updateJob.getLocalDateTime());
+            }
+
+            if (updateJob.getShouldTryAgain()) {
+                statementJob.setCorebankRetries(statementJob.getCorebankRetries() + 1);
+                statementJob.setStatus(StatusCode.SLEEPING.name());
+
+                //todo: calculate time to wake up
             }
         }
 
         //now, update the record in the database
         statementJobRepository.updateStatementJob(statementJob);
 
-        return new StatementJobModel(statementJob);
+        return statementJob;
+    }
+
+    public StatementJob updateJobFormatter(final String errorCode, final UpdateJobTemplate updateJob) {
+        //read the statementJob from database
+        StatementJob statementJob = statementJobRepository.findById(updateJob.getId());
+
+        //update startJob time if it is null
+        if (statementJob.getTimeStartJob() == null) {
+            statementJob.setTimeStartJob(updateJob.getLocalDateTime());
+        }
+
+        statementJob.setFormatterErrorCode(errorCode);
+        statementJob.setFormatterErrorDesc(updateJob.getErrorDesc());
+
+        if (ResponseErrorCode.SUCCESS.name().equals(errorCode)) {
+            statementJob.setStatus(StatusCode.IN_PROGRESS.name());
+        } else {
+            statementJob.setStatus(StatusCode.WITH_ERROR.name());
+            if (statementJob.getTimeEndJob() == null) {
+                statementJob.setTimeEndJob(updateJob.getLocalDateTime());
+            }
+        }
+
+        //now, update the record in the database
+        statementJobRepository.updateStatementJob(statementJob);
+
+        return statementJob;
+    }
+
+    public StatementJob updateJobSender(final String errorCode, final UpdateJobTemplate updateJob) {
+        //read the statementJob from database
+        StatementJob statementJob = statementJobRepository.findById(updateJob.getId());
+
+        //update startJob time if it is null
+        if (statementJob.getTimeStartJob() == null) {
+            statementJob.setTimeStartJob(updateJob.getLocalDateTime());
+        }
+
+        statementJob.setSenderErrorCode(errorCode);
+        statementJob.setSenderErrorDesc(updateJob.getErrorDesc());
+
+        if (ResponseErrorCode.SUCCESS.name().equals(errorCode)) {
+            statementJob.setStatus(StatusCode.COMPLETED.name());
+        } else {
+            //todo: if we should retry or the number of attempts are completed
+            statementJob.setStatus(StatusCode.WITH_ERROR.name());
+            if (statementJob.getTimeEndJob() == null) {
+                statementJob.setTimeEndJob(updateJob.getLocalDateTime());
+            }
+
+            if (updateJob.getShouldTryAgain()) {
+                statementJob.setCorebankRetries(statementJob.getCorebankRetries() + 1);
+                statementJob.setStatus(StatusCode.SLEEPING.name());
+
+                //todo: calculate time to wake up
+            }
+        }
+
+        //now, update the record in the database
+        statementJobRepository.updateStatementJob(statementJob);
+
+        return statementJob;
     }
 
     /**
@@ -136,81 +193,6 @@ public class JobService {
         res.put("dateTo",
                 LocalDate.of(nowDate.getYear(), calculatePreviousMonth(nowDate), calculateLastDayOfMonth(nowDate)));
         return res;
-    }
-
-    //in progress
-    public StatementJob inProgressUpdateJob(final StatementJob statementJob, final UpdateJobTemplate data) {
-        String adapterType = data.getAdapterType();
-        statementJob.setStatus("IN PROGRESS");
-        if (adapterType.equalsIgnoreCase("corebank")) {
-            if (statementJob.getTimeStartJob() == null) {
-                statementJob.setTimeStartJob(data.getLocalDateTime());
-            }
-            statementJob.setCorebankErrorCode(data.getErrorCode());
-            statementJob.setCorebankErrorDesc(data.getErrorDesc());
-            return statementJob;
-        }
-
-        if (adapterType.equalsIgnoreCase("formatter")) {
-            if (statementJob.getTimeStartJob() == null) {
-                statementJob.setTimeStartJob(data.getLocalDateTime());
-            }
-            statementJob.setFormatterErrorCode(data.getErrorCode());
-            statementJob.setFormatterErrorDesc(data.getErrorDesc());
-            return statementJob;
-        }
-
-        if (adapterType.equalsIgnoreCase("sender")) {
-            if (statementJob.getTimeStartJob() == null) {
-                statementJob.setTimeStartJob(data.getLocalDateTime());
-            }
-            statementJob.setSenderErrorCode(data.getErrorCode());
-            statementJob.setSenderErrorDesc(data.getErrorDesc());
-            return statementJob;
-        }
-        return statementJob;
-    }
-
-    //completed
-    public StatementJob completeUpdateJob(final StatementJob statementJob, final UpdateJobTemplate data) {
-        return statementJob;
-    }
-
-    //job processed with error but should retry
-    public StatementJob retryLaterUpdateJob(final StatementJob statementJob, final UpdateJobTemplate data) {
-        statementJob.setStatus("WITH ERROR");
-        if (statementJob.getTimeStartJob() == null) {
-            statementJob.setTimeStartJob(data.getLocalDateTime());
-        }
-        statementJob.setCorebankErrorCode(data.getErrorCode());
-        statementJob.setCorebankErrorDesc(data.getErrorDesc());
-        statementJob.setCorebankRetries(statementJob.getCorebankRetries() + 1);
-        return statementJob;
-    }
-
-    //job processed with error but shouldn't retry because state is final and unrecoverable
-    public StatementJob completeWithErrorUpdateJob(final StatementJob statementJob, final UpdateJobTemplate data) {
-        statementJob.setStatus("CLOSE ERROR");
-        if (statementJob.getTimeStartJob() == null) {
-            statementJob.setTimeStartJob(data.getLocalDateTime());
-        }
-        if (statementJob.getTimeEndJob() == null) {
-            statementJob.setTimeEndJob(data.getLocalDateTime());
-        }
-        statementJob.setCorebankErrorCode(data.getErrorCode());
-        statementJob.setCorebankErrorDesc(data.getErrorDesc());
-        return statementJob;
-    }
-
-    //in progress
-    public StatementJob completeSenderUpdateJob(final StatementJob statementJob, final UpdateJobTemplate data) {
-        statementJob.setStatus("CLOSE");
-        if (statementJob.getTimeEndJob() == null) {
-            statementJob.setTimeEndJob(data.getLocalDateTime());
-        }
-        statementJob.setSenderErrorCode("ok");
-        statementJob.setSenderErrorDesc(data.getErrorDesc());
-        return statementJob;
     }
 
     // calculates the previous month number of the provided date

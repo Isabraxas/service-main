@@ -18,7 +18,7 @@
 		<spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
         <cayenne.version>4.0.RC1</cayenne.version>
 		<artifact.version>0.1.9999</artifact.version>
-		<provider.corebank.version>0.1.77</provider.corebank.version>
+		<provider.corebank.version>0.1.78</provider.corebank.version>
 	</properties>
 
 	<parent>
@@ -71,6 +71,12 @@
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>
 			<version>2.1.7.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<artifactId>provider-corebank</artifactId>
+			<groupId>cc.viridian</groupId>
+			<version>${provider.corebank.version}</version>
 		</dependency>
 	</dependencies>
 
