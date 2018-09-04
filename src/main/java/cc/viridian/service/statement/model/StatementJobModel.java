@@ -33,6 +33,9 @@ public class StatementJobModel {
     private LocalDate dateFrom;
     private LocalDate dateTo;
 
+    private String formatterErrorCode;
+    private String formatterErrorDesc;
+
     private String senderErrorCode;
     private String senderErrorDesc;
     private Integer senderRetries;
@@ -66,6 +69,9 @@ public class StatementJobModel {
         frequency = statementJob.getFrequency();
         dateFrom = statementJob.getProcessDateFrom();
         dateTo = statementJob.getProcessDateTo();
+
+        formatterErrorCode = statementJob.getFormatterErrorCode();
+        formatterErrorDesc = statementJob.getFormatterErrorDesc();
 
         senderErrorCode = statementJob.getSenderErrorCode();
         senderErrorDesc = statementJob.getSenderErrorDesc();

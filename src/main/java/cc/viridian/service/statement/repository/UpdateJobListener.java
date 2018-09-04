@@ -25,19 +25,15 @@ public class UpdateJobListener {
                         @Headers final MessageHeaders headers) {
         log.info("received UpdateJob Message:");
 
-        log.info(data.getAccount());
-        log.info(data.getAdapterCode());
-        log.info(data.getAdapterType());
+        log.info(data.getAccount() + " " + data.getAdapterType() + " " + data.getAdapterCode());
         log.info(data.getErrorCode());
         log.info(data.getErrorDesc());
-        log.info(data.getId().toString());
-        log.info(data.getLocalDateTime().toString());
-        log.info(data.getShouldTryAgain().toString());
+        log.info("id: " + data.getId().toString() + " at " + data.getLocalDateTime().toString());
+        log.info("retry: " + data.getShouldTryAgain().toString());
 
-        log.info("key:" + headers.get("kafka_receivedMessageKey"));
-        log.info("partition:" + headers.get("kafka_receivedPartitionId"));
-        log.info("topic:" + headers.get("kafka_receivedTopic"));
-        log.info("offset:" + headers.get("kafka_offset"));
+        log.info("key: " + headers.get("kafka_receivedMessageKey")
+                     + " partition:" + headers.get("kafka_receivedPartitionId"));
+        log.info("topic:" + headers.get("kafka_receivedTopic") + " offset:" + headers.get("kafka_offset"));
 
         //todo: catch errors
         jobService.updateJob(data);

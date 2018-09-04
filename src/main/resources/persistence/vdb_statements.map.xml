@@ -70,6 +70,8 @@
 		<db-attribute name="COREBANK_RETRIES" type="INTEGER"/>
 		<db-attribute name="COREBANK_TRY_AGAIN_AT" type="TIMESTAMP"/>
 		<db-attribute name="CUSTOMER_CODE" type="VARCHAR" length="20"/>
+		<db-attribute name="FORMATTER_ERROR_CODE" type="VARCHAR" length="20"/>
+		<db-attribute name="FORMATTER_ERROR_DESC" type="VARCHAR" length="250"/>
 		<db-attribute name="FREQUENCY" type="VARCHAR" length="10"/>
 		<db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
 		<db-attribute name="PROCESS_DATE_FROM" type="DATE"/>
@@ -148,6 +150,8 @@
 		<obj-attribute name="corebankRetries" type="int" db-attribute-path="COREBANK_RETRIES"/>
 		<obj-attribute name="corebankTryAgainAt" type="java.time.LocalDateTime" db-attribute-path="COREBANK_TRY_AGAIN_AT"/>
 		<obj-attribute name="customerCode" type="java.lang.String" db-attribute-path="CUSTOMER_CODE"/>
+		<obj-attribute name="formatterErrorCode" type="java.lang.String" db-attribute-path="FORMATTER_ERROR_CODE"/>
+		<obj-attribute name="formatterErrorDesc" type="java.lang.String" db-attribute-path="FORMATTER_ERROR_DESC"/>
 		<obj-attribute name="frequency" type="java.lang.String" db-attribute-path="FREQUENCY"/>
 		<obj-attribute name="processDateFrom" type="java.time.LocalDate" db-attribute-path="PROCESS_DATE_FROM"/>
 		<obj-attribute name="processDateTo" type="java.time.LocalDate" db-attribute-path="PROCESS_DATE_TO"/>

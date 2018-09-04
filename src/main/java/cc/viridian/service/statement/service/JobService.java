@@ -61,6 +61,7 @@ public class JobService {
         if (data.getAdapterType().equalsIgnoreCase("corebank")) {
             switch (data.getErrorCode()) {
                 case "":
+                case "SUCCESS":
                     statementJob = inProgressUpdateJob(statementJob, data);
                     break;
                 case "invalid-account":
@@ -78,9 +79,18 @@ public class JobService {
             }
         }
 
-        if (data.getAdapterType().equalsIgnoreCase("sender")) {
+        if (data.getAdapterType().equalsIgnoreCase("formatter")) {
             switch (data.getErrorCode()) {
                 case "":
+                case "SUCCESS":
+                    statementJob = inProgressUpdateJob(statementJob, data);
+                    break;
+            }
+        }
+
+        if (data.getAdapterType().equalsIgnoreCase("sender")) {
+            switch (data.getErrorCode()) {
+                case "SUCCESS":
                     statementJob = completeSenderUpdateJob(statementJob, data);
                     break;
             }
@@ -130,12 +140,34 @@ public class JobService {
 
     //in progress
     public StatementJob inProgressUpdateJob(final StatementJob statementJob, final UpdateJobTemplate data) {
+        String adapterType = data.getAdapterType();
         statementJob.setStatus("IN PROGRESS");
-        if (statementJob.getTimeStartJob() == null) {
-            statementJob.setTimeStartJob(data.getLocalDateTime());
+        if (adapterType.equalsIgnoreCase("corebank")) {
+            if (statementJob.getTimeStartJob() == null) {
+                statementJob.setTimeStartJob(data.getLocalDateTime());
+            }
+            statementJob.setCorebankErrorCode(data.getErrorCode());
+            statementJob.setCorebankErrorDesc(data.getErrorDesc());
+            return statementJob;
         }
-        statementJob.setCorebankErrorCode("ok");
-        statementJob.setCorebankErrorDesc("processed");
+
+        if (adapterType.equalsIgnoreCase("formatter")) {
+            if (statementJob.getTimeStartJob() == null) {
+                statementJob.setTimeStartJob(data.getLocalDateTime());
+            }
+            statementJob.setFormatterErrorCode(data.getErrorCode());
+            statementJob.setFormatterErrorDesc(data.getErrorDesc());
+            return statementJob;
+        }
+
+        if (adapterType.equalsIgnoreCase("sender")) {
+            if (statementJob.getTimeStartJob() == null) {
+                statementJob.setTimeStartJob(data.getLocalDateTime());
+            }
+            statementJob.setSenderErrorCode(data.getErrorCode());
+            statementJob.setSenderErrorDesc(data.getErrorDesc());
+            return statementJob;
+        }
         return statementJob;
     }
 

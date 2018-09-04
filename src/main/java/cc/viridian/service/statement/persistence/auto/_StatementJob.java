@@ -29,6 +29,8 @@ public abstract class _StatementJob extends CayenneDataObject {
     public static final Property<Integer> COREBANK_RETRIES = Property.create("corebankRetries", Integer.class);
     public static final Property<LocalDateTime> COREBANK_TRY_AGAIN_AT = Property.create("corebankTryAgainAt", LocalDateTime.class);
     public static final Property<String> CUSTOMER_CODE = Property.create("customerCode", String.class);
+    public static final Property<String> FORMATTER_ERROR_CODE = Property.create("formatterErrorCode", String.class);
+    public static final Property<String> FORMATTER_ERROR_DESC = Property.create("formatterErrorDesc", String.class);
     public static final Property<String> FREQUENCY = Property.create("frequency", String.class);
     public static final Property<LocalDate> PROCESS_DATE_FROM = Property.create("processDateFrom", LocalDate.class);
     public static final Property<LocalDate> PROCESS_DATE_TO = Property.create("processDateTo", LocalDate.class);
@@ -118,6 +120,20 @@ public abstract class _StatementJob extends CayenneDataObject {
     }
     public String getCustomerCode() {
         return (String)readProperty("customerCode");
+    }
+
+    public void setFormatterErrorCode(String formatterErrorCode) {
+        writeProperty("formatterErrorCode", formatterErrorCode);
+    }
+    public String getFormatterErrorCode() {
+        return (String)readProperty("formatterErrorCode");
+    }
+
+    public void setFormatterErrorDesc(String formatterErrorDesc) {
+        writeProperty("formatterErrorDesc", formatterErrorDesc);
+    }
+    public String getFormatterErrorDesc() {
+        return (String)readProperty("formatterErrorDesc");
     }
 
     public void setFrequency(String frequency) {
