@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,6 +89,7 @@ public class JobService {
                 statementJob.setStatus(StatusCode.SLEEPING.name());
 
                 //todo: calculate time to wake up
+                statementJob.setCorebankTryAgainAt(calculateWhenToWakeUp());
             }
         }
 
@@ -204,6 +206,13 @@ public class JobService {
     private int calculateLastDayOfMonth(final LocalDate date) {
         YearMonth month = YearMonth.of(date.getYear(), date.getMonth());
         return month.atEndOfMonth().getDayOfMonth();
+    }
+
+    // calculates the previous month number of the provided date
+    private LocalDateTime calculateWhenToWakeUp() {
+        LocalDateTime now = LocalDateTime.now();
+
+        return (now.plusHours(1));
     }
 
     public Map<String, Object> processTruncate() {

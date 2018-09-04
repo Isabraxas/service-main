@@ -17,8 +17,7 @@ public class StatementJobProducer {
     private KafkaTemplate<String, JobTemplate> kafkaTemplate;
 
     public void send(final String messageKey, final JobTemplate data) {
-        log.info("sending message with key=" + messageKey);
-        log.debug("sending data= " + data);
+        log.debug("sending message with key=" + messageKey + " " + data);
 
         Message<JobTemplate> message = MessageBuilder
             .withPayload(data)

@@ -70,7 +70,8 @@ public class UpdateJobListener {
     private String validateAdapterCode(final String code) {
 
         for (ResponseAdapterCode value : ResponseAdapterCode.values()) {
-            if (value.name().equalsIgnoreCase(code)) {
+            if (value.name().equalsIgnoreCase(code)
+                || value.name().equalsIgnoreCase("ADAPTER_" + code)) {
                 return value.name();
             }
         }
