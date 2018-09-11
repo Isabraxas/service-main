@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @NoArgsConstructor
@@ -33,5 +35,12 @@ public class StatementService {
 
     public ListAccountsResponse listAccountsMonthly() {
         return statementMainRepository.listAccountsFilterByMonthlyFrequency();
+    }
+
+    public Map<String, Object> processTruncate() {
+        Map<String, Object> response = new HashMap<>();
+
+        statementMainRepository.truncateStatements();
+        return response;
     }
 }

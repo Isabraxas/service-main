@@ -3,12 +3,15 @@ package cc.viridian.service.statement.repository;
 import cc.viridian.service.statement.model.AccountsRegistered;
 import cc.viridian.service.statement.payload.ListAccountsResponse;
 import cc.viridian.service.statement.payload.RegisterAccountPost;
+import cc.viridian.service.statement.persistence.StatementJob;
 import cc.viridian.service.statement.persistence.StatementMain;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.cayenne.ObjectContext;
+import org.apache.cayenne.QueryResponse;
 import org.apache.cayenne.configuration.server.ServerRuntime;
 import org.apache.cayenne.query.EJBQLQuery;
 import org.apache.cayenne.query.ObjectSelect;
+import org.apache.cayenne.query.SQLTemplate;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -107,4 +110,12 @@ public class StatementMainRepository {
 
         return result.get(0);
     }
+
+    public void truncateStatements() {
+        ObjectContext context = mainServerRuntime.newContext();
+
+        SQLTemplate truncateQuery = new SQLTemplate(StatementJob.class, "truncate table STATEMENT_MAIN");
+        QueryResponse response = context.performGenericQuery(truncateQuery);
+    }
+
 }

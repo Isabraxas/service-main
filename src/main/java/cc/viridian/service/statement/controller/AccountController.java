@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*")
-public class StatementController {
+public class AccountController {
 
     @Autowired
     StatementService statementService;
@@ -39,5 +40,10 @@ public class StatementController {
     public ListAccountsResponse listAccountsMonthly() {
 
         return statementService.listAccountsMonthly();
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/account/truncate")
+    public Map<String, Object> processTruncate() {
+        return statementService.processTruncate();
     }
 }

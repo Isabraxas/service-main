@@ -1,5 +1,6 @@
 package cc.viridian.service.statement.repository;
 
+import cc.viridian.service.statement.model.JobTemplate;
 import cc.viridian.service.statement.model.StatementJobModel;
 import cc.viridian.service.statement.payload.ListJobsResponse;
 import cc.viridian.service.statement.payload.RegisterJobPost;
@@ -24,9 +25,12 @@ import java.util.List;
 public class StatementJobRepository {
     private ServerRuntime mainServerRuntime;
 
+    private StatementJobProducer statementJobProducer;
+
     @Autowired
-    public StatementJobRepository(ServerRuntime mainServerRuntime) {
+    public StatementJobRepository(ServerRuntime mainServerRuntime, StatementJobProducer statementJobProducer) {
         this.mainServerRuntime = mainServerRuntime;
+        this.statementJobProducer = statementJobProducer;
     }
 
     public ListJobsResponse listJobs(final Integer start, final Integer length) {
@@ -126,6 +130,42 @@ public class StatementJobRepository {
 
         SQLTemplate truncateQuery = new SQLTemplate(StatementJob.class, "truncate table STATEMENT_JOB");
         QueryResponse response = context.performGenericQuery(truncateQuery);
+    }
 
+    public ListJobsResponse listJobsToRetryCorebank() {
+        ObjectContext context = mainServerRuntime.newContext();
+
+        //Select all statement
+        List<StatementJob> jobs = ObjectSelect.query(StatementJob.class)
+                                              .where(StatementJob.COREBANK_TRY_AGAIN_AT.isNotNull().andExp(
+                                                  StatementJob.COREBANK_TRY_AGAIN_AT.lt(LocalDateTime.now())
+                                              ))
+                                              .select(context);
+
+        Iterator<StatementJob> it = jobs.iterator();
+        while (it.hasNext()) {
+            StatementJob statementJob = it.next();
+            log.info(statementJob.getAccountCode());
+            log.info(statementJob.getCorebankTryAgainAt().toString());
+
+            /*
+            RegisterJobPost jobPost = new RegisterJobPost();
+            jobPost.setAccount(statementJob.getAccountCode());
+            jobPost.setCurrency(statementJob.getAccountCurrency());
+            jobPost.setType(statementJob.getAccountType());
+            jobPost.setCustomerCode(statementJob.getCustomerCode());
+            jobPost.setRecipient(statementJob.getSendRecipient());
+            jobPost.setFrequency(statementJob.getFrequency());
+            jobPost.setDateFrom(statementJob.getProcessDateFrom());
+            jobPost.setDateTo(statementJob.getProcessDateTo());
+            jobPost.setCorebankAdapter(statementJob.getAdapterCorebank());
+            jobPost.setFormatAdapter(statementJob.getAdapterFormat());
+            jobPost.setSendAdapter(statementJob.getAdapterSend());
+            */
+
+            JobTemplate jobTemplate = new JobTemplate(statementJob);
+            statementJobProducer.send("" + jobTemplate.getId(), jobTemplate);
+        }
+        return null;
     }
 }

@@ -26,11 +26,9 @@ import java.util.Map;
 @Service
 public class JobService {
 
-    @Autowired
-    StatementService statementService;
+    private StatementService statementService;
 
-    @Autowired
-    StatementJobProducer statementJobProducer;
+    private StatementJobProducer statementJobProducer;
 
     private StatementJobRepository statementJobRepository;
 
@@ -43,8 +41,12 @@ public class JobService {
     };
 
     @Autowired
-    public JobService(StatementJobRepository statementJobRepository) {
+    public JobService(StatementService statementService,
+                       StatementJobProducer statementJobProducer,
+                       StatementJobRepository statementJobRepository) {
         this.statementJobRepository = statementJobRepository;
+        this.statementService = statementService;
+        this.statementJobProducer = statementJobProducer;
     }
 
     public ListJobsResponse listJobs(final Integer start, final Integer length) {
