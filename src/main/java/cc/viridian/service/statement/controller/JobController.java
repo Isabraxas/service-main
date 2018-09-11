@@ -1,7 +1,6 @@
 package cc.viridian.service.statement.controller;
 
 import cc.viridian.service.statement.model.StatementJobModel;
-import cc.viridian.service.statement.payload.ListAccountsResponse;
 import cc.viridian.service.statement.payload.ListJobsResponse;
 import cc.viridian.service.statement.payload.RegisterJobPost;
 import cc.viridian.service.statement.service.JobService;
