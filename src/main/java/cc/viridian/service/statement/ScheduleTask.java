@@ -26,13 +26,12 @@ public class ScheduleTask {
     @Scheduled(cron = "0 * * * * ?")  //each minute at 0 seconds
     public void scheduleTaskUsingCronExpression() {
 
-        log.info("Current Thread : " +  Thread.currentThread().getName());
+        log.info("Current Thread : " + Thread.currentThread().getName());
 
         try {
             scheduleService.retryJobs();
         } catch (CorebankException e) {
             log.error(e.getMessage());
         }
-
     }
 }

@@ -1,24 +1,28 @@
 package cc.viridian.service.statement.repository;
 
-import cc.viridian.service.statement.model.JobTemplate;
 import cc.viridian.service.statement.model.StatementJobModel;
 import cc.viridian.service.statement.payload.ListJobsResponse;
 import cc.viridian.service.statement.payload.RegisterJobPost;
 import cc.viridian.service.statement.persistence.StatementJob;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.QueryResponse;
+import org.apache.cayenne.ResultIterator;
+import org.apache.cayenne.access.DataContext;
 import org.apache.cayenne.configuration.server.ServerRuntime;
 import org.apache.cayenne.query.EJBQLQuery;
 import org.apache.cayenne.query.ObjectSelect;
 import org.apache.cayenne.query.SQLTemplate;
 import org.apache.cayenne.query.SelectById;
+import org.apache.cayenne.query.SelectQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Repository
@@ -132,16 +136,78 @@ public class StatementJobRepository {
         QueryResponse response = context.performGenericQuery(truncateQuery);
     }
 
+    public Long countJobsToRetryCorebank() {
+        ObjectContext context = mainServerRuntime.newContext();
+
+        String countQuery = "select count(job) from StatementJob job "
+            + "where job.status = 'SLEEPING' and job.corebankTryAgainAt IS NOT NULL ";
+        log.info(countQuery);
+
+        EJBQLQuery query = new EJBQLQuery(countQuery);
+        List<Long> result = context.performQuery(query);
+        if (result.size() == 1) {
+            return result.get(0);
+        } else {
+            return 0L;
+        }
+    }
+
+    public ResultIterator getJobsToRetryCorebankIterator() throws CayenneRuntimeException {
+        ObjectContext context = mainServerRuntime.newContext();
+
+        SelectQuery query = new SelectQuery(StatementJob.class);
+
+        query.andQualifier(StatementJob.COREBANK_TRY_AGAIN_AT.isNotNull());
+        query.andQualifier(StatementJob.COREBANK_TRY_AGAIN_AT.lt(LocalDateTime.now()));
+        query.andQualifier(StatementJob.STATUS.eq("SLEEPING"));
+
+        DataContext dataContext = (DataContext) context;
+
+        return dataContext.performIteratedQuery(query);
+    }
+
+    public Map getJobsToRetryCorebankNextRow(final ResultIterator iterator) throws CayenneRuntimeException {
+        if (iterator.hasNextRow()) {
+            Map row = (Map) iterator.nextRow();
+            log.debug(row.toString());
+            return row;
+        }
+        return null;
+    }
+
+    public void getJobsToRetryCorebankNextFinally(final ResultIterator iterator) throws CayenneRuntimeException {
+        if (iterator != null) {
+            iterator.close();
+        }
+    }
+
     public ListJobsResponse listJobsToRetryCorebank() {
         ObjectContext context = mainServerRuntime.newContext();
 
-        //Select all statement
-        List<StatementJob> jobs = ObjectSelect.query(StatementJob.class)
-                                              .where(StatementJob.COREBANK_TRY_AGAIN_AT.isNotNull().andExp(
-                                                  StatementJob.COREBANK_TRY_AGAIN_AT.lt(LocalDateTime.now())
-                                              ))
-                                              .select(context);
+        SelectQuery query = new SelectQuery(StatementJob.class);
 
+        query.andQualifier(StatementJob.COREBANK_TRY_AGAIN_AT.isNotNull());
+        query.andQualifier(StatementJob.COREBANK_TRY_AGAIN_AT.lt(LocalDateTime.now()));
+        query.andQualifier(StatementJob.STATUS.eq("SLEEPING"));
+
+        DataContext dataContext = (DataContext) context;
+        try {
+
+            ResultIterator it = dataContext.performIteratedQuery(query);
+
+            try {
+                while (it.hasNextRow()) {
+                    Map row = (Map) it.nextRow();
+                    log.debug(row.toString());
+                    // do something with the row...
+                }
+            } finally {
+                it.close();
+            }
+        } catch (CayenneRuntimeException e) {
+            e.printStackTrace();
+        }
+/*
         Iterator<StatementJob> it = jobs.iterator();
         while (it.hasNext()) {
             StatementJob statementJob = it.next();
@@ -163,9 +229,9 @@ public class StatementJobRepository {
             jobPost.setSendAdapter(statementJob.getAdapterSend());
             */
 
-            JobTemplate jobTemplate = new JobTemplate(statementJob);
-            statementJobProducer.send("" + jobTemplate.getId(), jobTemplate);
-        }
+        //JobTemplate jobTemplate = new JobTemplate(statementJob);
+        //statementJobProducer.send("" + jobTemplate.getId(), jobTemplate);
+        //}
         return null;
     }
 }

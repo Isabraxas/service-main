@@ -21,7 +21,7 @@ node {
     }
     stage('Checkstyle') {
         dir(repoName) {
-            sh "mvn checkstyle:checkstyle -Dcheckstyle.config.location=viridian_checks.xml"
+            sh "mvn checkstyle:checkstyle -Dexcludes=**/persistence/**/* -Dcheckstyle.config.location=viridian_checks.xml"
             publishHTML ( [
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,

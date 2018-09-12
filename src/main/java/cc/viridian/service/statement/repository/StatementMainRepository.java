@@ -117,5 +117,4 @@ public class StatementMainRepository {
         SQLTemplate truncateQuery = new SQLTemplate(StatementJob.class, "truncate table STATEMENT_MAIN");
         QueryResponse response = context.performGenericQuery(truncateQuery);
     }
-
 }
