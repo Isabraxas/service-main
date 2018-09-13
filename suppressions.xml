@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+<suppressions>
+    <suppress checks="TypeNameCheck"
+              files="[/\\]auto[/\\]"/>
+    <suppress checks="RegexpSinglelineCheck"
+              files="[/\\]auto[/\\]"/>
+    <suppress checks="FinalParametersCheck"
+              files="[/\\]auto[/\\]"/>
+    <suppress checks="WhitespaceAfterCheck"
+              files="[/\\]auto[/\\]"/>
+    <suppress checks="TypeNameCheck"
+              files="[/\\]auto[/\\]"/>
+    <suppress checks="LineLengthCheck"
+              files="[/\\]auto[/\\]"/>
+    <suppress checks="AvoidInlineConditionalsCheck"
+              files="[/\\]auto[/\\]"/>
+    <suppress checks="FileTabCharacterCheck"
+              files="[/\\]auto[/\\]"/>
+</suppressions>
