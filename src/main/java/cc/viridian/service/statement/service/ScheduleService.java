@@ -30,9 +30,10 @@ public class ScheduleService {
         log.info("" + count);
 
 
-        Thread thread = new Thread(myRunnable);
+        Thread thread = new Thread(myRunnable, "ScheduledThread");
         thread.start();
 
+        /*
         isProcessing = true;
         try {
             ResultIterator iterator = statementJobRepository.getJobsToRetryCorebankIterator();
@@ -51,12 +52,30 @@ public class ScheduleService {
         } catch (CayenneRuntimeException e) {
             log.error(e.getMessage());
         }
+         */
+
     }
+
     Runnable myRunnable = new Runnable(){
 
         public void run(){
-            for (int i = 0; i < 20; i++) {
-                log.info("Runnable running: " + i);
+            isProcessing = true;
+            try {
+                ResultIterator iterator = statementJobRepository.getJobsToRetryCorebankIterator();
+
+                Map row = null;
+                do {
+                    row = statementJobRepository.getJobsToRetryCorebankNextRow(iterator);
+                    if (row != null) {
+                        log.info(row.toString());
+                    }
+                } while (row != null);
+                statementJobRepository.getJobsToRetryCorebankNextFinally(iterator);
+
+                //ListJobsResponse listAccountsResponse = statementJobRepository.listJobsToRetryCorebank();
+                isProcessing = false;
+            } catch (CayenneRuntimeException e) {
+                log.error(e.getMessage());
             }
         }
     };
