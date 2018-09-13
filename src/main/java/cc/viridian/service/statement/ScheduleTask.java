@@ -16,19 +16,13 @@ public class ScheduleTask {
     @Autowired
     public ScheduleTask(ScheduleService scheduleService) {
         this.scheduleService = scheduleService;
-        try {
-            scheduleService.retryJobs();
-        } catch (CorebankException e) {
-            log.error(e.getMessage());
-        }
     }
 
     @Scheduled(cron = "0 * * * * ?")  //each minute at 0 seconds
     public void scheduleTaskUsingCronExpression() {
 
-        log.info("Current Thread : " + Thread.currentThread().getName());
-
         try {
+            scheduleService.getThreadInfo();
             scheduleService.retryJobs();
         } catch (CorebankException e) {
             log.error(e.getMessage());

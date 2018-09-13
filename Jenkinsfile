@@ -72,8 +72,8 @@ node {
             if (currentBuild.result != "SUCCESS") {
                 slackFooter = "\n`${currentBuild.result}`";
             }
-            //slackSend color: slackColor,
-            //    message: "*" + artifactName + "*\n" + summary + "\n_" + committerEmail + "_" + slackFooter
+            slackSend color: slackColor,
+                message: "*" + artifactName + "*\n" + summary + "\n_" + committerEmail + "_" + slackFooter
 
             sh '/var/lib/jenkins/viridian/deploy-' + repoName + '.sh'
         }

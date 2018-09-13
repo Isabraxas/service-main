@@ -37,8 +37,11 @@ public class JobService {
         IN_PROGRESS,
         WITH_ERROR,
         SLEEPING,
+        QUEUED,
         COMPLETED
     };
+
+    private int[] retryScale = {1, 2, 3};
 
     @Autowired
     public JobService(StatementService statementService,
@@ -88,10 +91,15 @@ public class JobService {
 
             if (updateJob.getShouldTryAgain()) {
                 statementJob.setCorebankRetries(statementJob.getCorebankRetries() + 1);
-                statementJob.setStatus(StatusCode.SLEEPING.name());
 
-                //todo: calculate time to wake up
-                statementJob.setCorebankTryAgainAt(calculateWhenToWakeUp());
+                LocalDateTime minutesToWait = calculateWhenToWakeUp(statementJob.getCorebankRetries());
+
+                if (minutesToWait != null) {
+                    statementJob.setStatus(StatusCode.SLEEPING.name());
+                    statementJob.setCorebankTryAgainAt(minutesToWait);
+                } else {
+                    statementJob.setStatus(StatusCode.WITH_ERROR.name());
+                }
             }
         }
 
@@ -211,10 +219,19 @@ public class JobService {
     }
 
     // calculates the previous month number of the provided date
-    private LocalDateTime calculateWhenToWakeUp() {
-        LocalDateTime now = LocalDateTime.now();
+    private LocalDateTime calculateWhenToWakeUp(final int retries) {
 
-        return (now.plusHours(1));
+        LocalDateTime now = LocalDateTime.now();
+        int retryNumber = retries;
+        if (retryNumber < 0) {
+            return null;
+        }
+
+        if (retryNumber > retryScale.length) {
+            return null;
+        }
+
+        return (now.plusMinutes(retryScale[retryNumber]));
     }
 
     public Map<String, Object> processTruncate() {

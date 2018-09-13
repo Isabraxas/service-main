@@ -6,9 +6,9 @@
     <logger name="org.apache.kafka.clients.producer.ProducerConfig" level="WARN"/>
     <logger name="org.apache.kafka.clients.consumer.ConsumerConfig" level="WARN"/>
 
-    <logger name="org.apache.cayenne.log.JdbcEventLogger" level="INFO"/>
-    <logger name="o.a.cayenne.datasource.DriverDataSource" level="INFO"/>
-    <logger name="o.a.c.c.server.DataDomainProvider" level="INFO"/>
+    <logger name="org.apache.cayenne.log.JdbcEventLogger" level="WARN"/>
+    <logger name="o.a.cayenne.datasource.DriverDataSource" level="WARN"/>
+    <logger name="o.a.c.c.server.DataDomainProvider" level="WARN"/>
 
     <logger name="cc.viridian" level="DEBUG"/>
 </configuration>

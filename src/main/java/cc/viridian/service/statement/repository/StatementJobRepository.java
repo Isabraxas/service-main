@@ -141,7 +141,7 @@ public class StatementJobRepository {
 
         String countQuery = "select count(job) from StatementJob job "
             + "where job.status = 'SLEEPING' and job.corebankTryAgainAt IS NOT NULL ";
-        log.info(countQuery);
+        log.debug(countQuery);
 
         EJBQLQuery query = new EJBQLQuery(countQuery);
         List<Long> result = context.performQuery(query);
@@ -169,13 +169,14 @@ public class StatementJobRepository {
     public Map getJobsToRetryCorebankNextRow(final ResultIterator iterator) throws CayenneRuntimeException {
         if (iterator.hasNextRow()) {
             Map row = (Map) iterator.nextRow();
-            log.debug(row.toString());
+            //log.debug(row.toString());
             return row;
         }
         return null;
     }
 
     public void getJobsToRetryCorebankNextFinally(final ResultIterator iterator) throws CayenneRuntimeException {
+        log.info("getJobsToRetryCorebankNextFinally close iterator");
         if (iterator != null) {
             iterator.close();
         }

@@ -38,6 +38,8 @@ public class CayenneAutoConfiguration {
                                                        .url(url)
                                                        .user(user)
                                                        .password(password)
+                                                       .minConnections(2)
+                                                       .maxConnections(5)
                                                        .build();
 
             log.info("connecting to database: " + url);
