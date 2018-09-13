@@ -41,7 +41,7 @@ public class JobService {
         COMPLETED
     };
 
-    private int[] retryScale = {1, 2, 3};
+    private int[] retryScale = {0, 1, 2, 5, 60, 100};
 
     @Autowired
     public JobService(StatementService statementService,
