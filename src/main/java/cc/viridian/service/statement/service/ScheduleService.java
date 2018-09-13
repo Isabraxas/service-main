@@ -29,6 +29,10 @@ public class ScheduleService {
         Long count = statementJobRepository.countJobsToRetryCorebank();
         log.info("" + count);
 
+
+        Thread thread = new Thread(myRunnable);
+        thread.start();
+
         isProcessing = true;
         try {
             ResultIterator iterator = statementJobRepository.getJobsToRetryCorebankIterator();
@@ -48,4 +52,13 @@ public class ScheduleService {
             log.error(e.getMessage());
         }
     }
+    Runnable myRunnable = new Runnable(){
+
+        public void run(){
+            for (int i = 0; i < 20; i++) {
+                log.info("Runnable running: " + i);
+            }
+        }
+    };
 }
+
