@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,10 +39,12 @@ public class JobService {
         WITH_ERROR,
         SLEEPING,
         QUEUED,
+        SLEEPING_SENDER,
         COMPLETED
     };
 
-    private int[] retryScale = {0, 1, 2, 5, 60, 100};
+    private int[] retryJobsScale = {0, 1, 2, 5, 60, 100};
+    private int[] retrySenderScale = {0, 1, 2, 5, 60, 100};
 
     @Autowired
     public JobService(StatementService statementService,
@@ -151,17 +154,22 @@ public class JobService {
         if (ResponseErrorCode.SUCCESS.name().equals(errorCode)) {
             statementJob.setStatus(StatusCode.COMPLETED.name());
         } else {
-            //todo: if we should retry or the number of attempts are completed
             statementJob.setStatus(StatusCode.WITH_ERROR.name());
             if (statementJob.getTimeEndJob() == null) {
                 statementJob.setTimeEndJob(updateJob.getLocalDateTime());
             }
 
             if (updateJob.getShouldTryAgain()) {
-                statementJob.setCorebankRetries(statementJob.getCorebankRetries() + 1);
-                statementJob.setStatus(StatusCode.SLEEPING.name());
+                statementJob.setSenderRetries(statementJob.getSenderRetries() + 1);
 
-                //todo: calculate time to wake up
+                LocalDateTime minutesToWait = calculateWhenToWakeUpSender(statementJob.getSenderRetries());
+
+                if (minutesToWait != null) {
+                    statementJob.setStatus(StatusCode.SLEEPING_SENDER.name());
+                    statementJob.setSenderTryAgainAt(minutesToWait);
+                } else {
+                    statementJob.setStatus(StatusCode.WITH_ERROR.name());
+                }
             }
         }
 
@@ -227,11 +235,27 @@ public class JobService {
             return null;
         }
 
-        if (retryNumber > retryScale.length) {
+        if (retryNumber > retryJobsScale.length) {
             return null;
         }
 
-        return (now.plusMinutes(retryScale[retryNumber]));
+        return now.plusMinutes(retryJobsScale[retryNumber]).truncatedTo(ChronoUnit.MINUTES);
+    }
+
+    // calculates the previous month number of the provided date
+    private LocalDateTime calculateWhenToWakeUpSender(final int retries) {
+
+        LocalDateTime now = LocalDateTime.now();
+        int retryNumber = retries;
+        if (retryNumber < 0) {
+            return null;
+        }
+
+        if (retryNumber > retrySenderScale.length) {
+            return null;
+        }
+
+        return now.plusMinutes(retrySenderScale[retryNumber]).truncatedTo(ChronoUnit.MINUTES);
     }
 
     public Map<String, Object> processTruncate() {
