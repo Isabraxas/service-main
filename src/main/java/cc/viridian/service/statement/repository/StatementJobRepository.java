@@ -18,7 +18,11 @@ import org.apache.cayenne.query.SelectById;
 import org.apache.cayenne.query.SelectQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -138,12 +142,41 @@ public class StatementJobRepository {
 
     public Long countJobsToRetryCorebank() {
         ObjectContext context = mainServerRuntime.newContext();
-
+        String d = "";
+        /*
+        String otherQuery = "select job.corebankTryAgainAt from StatementJob job where job.corebankTryAgainAt IS NOT NULL";
+        EJBQLQuery queryX = new EJBQLQuery(otherQuery);
+        List<LocalDateTime> list = context.performQuery(queryX);
+        d = list.get(0).toString();
+         */
+        // java 2018-09-18T20:34
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy").appendLiteral("-")
+            .appendPattern("MM").appendLiteral("-")
+            .appendPattern("dd").appendLiteral("T")
+            .appendPattern("HH").appendLiteral(":")
+            .appendPattern("mm")
+            .toFormatter();
+        // postgres 2018-09-19 12:57:34.761+00
+        DateTimeFormatter formatterP = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy").appendLiteral("-")
+            .appendPattern("MM").appendLiteral("-")
+            .appendPattern("dd").appendLiteral(" ")
+            .appendPattern("HH").appendLiteral(":")
+            .appendPattern("mm").appendLiteral(":")
+            .appendPattern("ss").appendLiteral(".")
+            .appendPattern("SSS").appendPattern("X")
+            .toFormatter();
+        d = LocalDateTime.now().format(formatter);
+        log.info(d);
+        //d = ZonedDateTime.now().format(formatterP);
+        log.info(d);
         String countQuery = "select count(job) from StatementJob job "
-            + "where job.status = 'SLEEPING' and job.corebankTryAgainAt IS NOT NULL and job.corebankTryAgainAt <=  ";
+            + "where job.status = 'SLEEPING' and job.corebankTryAgainAt IS NOT NULL and job.corebankTryAgainAt <= :date";
         log.debug(countQuery);
 
         EJBQLQuery query = new EJBQLQuery(countQuery);
+        query.setParameter("date",LocalDateTime.now());
         List<Long> result = context.performQuery(query);
         if (result.size() == 1) {
             return result.get(0);
