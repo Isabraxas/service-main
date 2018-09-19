@@ -140,7 +140,7 @@ public class StatementJobRepository {
         ObjectContext context = mainServerRuntime.newContext();
 
         String countQuery = "select count(job) from StatementJob job "
-            + "where job.status = 'SLEEPING' and job.corebankTryAgainAt IS NOT NULL ";
+            + "where job.status = 'SLEEPING' and job.corebankTryAgainAt IS NOT NULL and job.corebankTryAgainAt <=  ";
         log.debug(countQuery);
 
         EJBQLQuery query = new EJBQLQuery(countQuery);
@@ -182,13 +182,14 @@ public class StatementJobRepository {
         }
     }
 
+    @Deprecated
     public ListJobsResponse listJobsToRetryCorebank() {
         ObjectContext context = mainServerRuntime.newContext();
 
         SelectQuery query = new SelectQuery(StatementJob.class);
 
         query.andQualifier(StatementJob.COREBANK_TRY_AGAIN_AT.isNotNull());
-        query.andQualifier(StatementJob.COREBANK_TRY_AGAIN_AT.lt(LocalDateTime.now()));
+        query.andQualifier(StatementJob.COREBANK_TRY_AGAIN_AT.lte(LocalDateTime.now()));
         query.andQualifier(StatementJob.STATUS.eq("SLEEPING"));
 
         DataContext dataContext = (DataContext) context;
