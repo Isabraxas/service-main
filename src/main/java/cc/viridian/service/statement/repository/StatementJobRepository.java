@@ -18,7 +18,11 @@ import org.apache.cayenne.query.SelectById;
 import org.apache.cayenne.query.SelectQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -138,12 +142,12 @@ public class StatementJobRepository {
 
     public Long countJobsToRetryCorebank() {
         ObjectContext context = mainServerRuntime.newContext();
-
         String countQuery = "select count(job) from StatementJob job "
-            + "where job.status = 'SLEEPING' and job.corebankTryAgainAt IS NOT NULL and job.corebankTryAgainAt <=  ";
+            + "where job.status = 'SLEEPING' and job.corebankTryAgainAt IS NOT NULL and job.corebankTryAgainAt <= :date";
         log.debug(countQuery);
 
         EJBQLQuery query = new EJBQLQuery(countQuery);
+        query.setParameter("date",LocalDateTime.now());
         List<Long> result = context.performQuery(query);
         if (result.size() == 1) {
             return result.get(0);
