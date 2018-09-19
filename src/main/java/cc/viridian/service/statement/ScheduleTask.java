@@ -1,6 +1,6 @@
 package cc.viridian.service.statement;
 
-import cc.viridian.provider.Exception.CorebankException;
+import cc.viridian.provider.exception.CorebankException;
 import cc.viridian.service.statement.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

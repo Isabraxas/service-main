@@ -1,6 +1,6 @@
 package cc.viridian.service.statement.service;
 
-import cc.viridian.provider.Exception.CorebankException;
+import cc.viridian.provider.exception.CorebankException;
 import cc.viridian.service.statement.repository.StatementJobProducer;
 import cc.viridian.service.statement.repository.StatementJobRepository;
 import com.sun.xml.internal.ws.client.SenderException;
