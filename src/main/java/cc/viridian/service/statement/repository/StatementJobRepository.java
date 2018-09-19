@@ -16,6 +16,7 @@ import org.apache.cayenne.query.ObjectSelect;
 import org.apache.cayenne.query.SQLTemplate;
 import org.apache.cayenne.query.SelectById;
 import org.apache.cayenne.query.SelectQuery;
+import org.apache.cayenne.query.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
@@ -44,6 +45,7 @@ public class StatementJobRepository {
         List<StatementJob> jobs = ObjectSelect.query(StatementJob.class)
                                               .limit(length)
                                               .offset(start)
+                                              .orderBy("timeCreateJob", SortOrder.ASCENDING)
                                               .select(context);
 
         List<StatementJobModel> jobsRegistered = new ArrayList<>();
@@ -141,7 +143,6 @@ public class StatementJobRepository {
         String countQuery = "select count(job) from StatementJob job "
             + "where job.status = 'SLEEPING' and job.corebankTryAgainAt IS NOT NULL "
             + "and job.corebankTryAgainAt <= :date";
-        log.debug(countQuery);
 
         EJBQLQuery query = new EJBQLQuery(countQuery);
         query.setParameter("date", LocalDateTime.now());
@@ -158,7 +159,6 @@ public class StatementJobRepository {
         String countQuery = "select count(job) from StatementJob job "
             + "where job.status = 'SLEEPING_SENDER' and job.senderTryAgainAt IS NOT NULL "
             + "and job.senderTryAgainAt <= :date";
-        log.debug(countQuery);
 
         EJBQLQuery query = new EJBQLQuery(countQuery);
         query.setParameter("date", LocalDateTime.now());

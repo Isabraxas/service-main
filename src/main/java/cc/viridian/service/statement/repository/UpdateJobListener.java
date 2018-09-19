@@ -25,26 +25,29 @@ public class UpdateJobListener {
     @KafkaListener(topics = "${topic.statement.update}")
     public void receive(@Payload final UpdateJobTemplate data,
                         @Headers final MessageHeaders headers) {
-        log.info("received UpdateJob Message:");
-
         String errorCode = validateErrorCode(data.getErrorCode());
         String adapterType = validateAdapterCode(data.getAdapterType());
 
+        log.info("received UpdateJob Message: " + data.getAccount() + " "
+                     + adapterType.replace("ADAPTER_", "") + " " + data.getAdapterCode());
+
         if (errorCode == null || adapterType == null) {
-            log.error("update job message has invalid codes");
+            log.error("updateJob message has invalid codes");
             log.error("errorCode: " + errorCode);
             log.error("adapterType: " + adapterType);
             return;
         }
 
-        log.info(data.getAccount() + " " + adapterType + " " + data.getAdapterCode());
         log.info(errorCode + ": " + data.getErrorDesc());
         log.info("id: " + data.getId().toString() + " at " + data.getLocalDateTime().toString());
-        log.info("retry: " + data.getShouldTryAgain().toString());
+        if (data.getShouldTryAgain()) {
+            log.info("retry: " + data.getShouldTryAgain().toString());
+        }
 
-        log.info("key: " + headers.get("kafka_receivedMessageKey")
-                     + " partition:" + headers.get("kafka_receivedPartitionId"));
-        log.info("topic:" + headers.get("kafka_receivedTopic") + " offset:" + headers.get("kafka_offset"));
+        log.info("topic:" + headers.get("kafka_receivedTopic")
+                     + " offset: " + headers.get("kafka_offset")
+                     + "key: " + headers.get("kafka_receivedMessageKey")
+                     + " partition: " + headers.get("kafka_receivedPartitionId"));
 
         if (adapterType.equals(ResponseAdapterCode.ADAPTER_COREBANK.name())) {
             jobService.updateJobCorebank(errorCode, data);

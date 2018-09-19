@@ -43,8 +43,8 @@ public class JobService {
         COMPLETED
     };
 
-    private int[] retryJobsScale = {0, 1, 2, 5, 60, 100};
-    private int[] retrySenderScale = {0, 1, 2, 5, 60, 100};
+    private int[] retryJobsScale = {0, 1, 2, 3, 4};
+    private int[] retrySenderScale = {0, 1, 2, 3, 4};
 
     @Autowired
     public JobService(StatementService statementService,
