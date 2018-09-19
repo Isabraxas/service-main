@@ -3,7 +3,6 @@ package cc.viridian.service.statement.service;
 import cc.viridian.provider.exception.CorebankException;
 import cc.viridian.service.statement.repository.StatementJobProducer;
 import cc.viridian.service.statement.repository.StatementJobRepository;
-import com.sun.xml.internal.ws.client.SenderException;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,7 +107,7 @@ public class ScheduleService {
         }
     }
 
-    public void retrySender() throws SenderException {
+    public void retrySender() throws CorebankException {
         if (status == ScheduleServiceStatus.IDLE) {
             Long count = statementJobRepository.countJobsToRetrySender();
             log.info("there are " + count + " records to process in retrySender");
