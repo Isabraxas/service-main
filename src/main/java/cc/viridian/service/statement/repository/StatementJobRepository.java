@@ -18,11 +18,7 @@ import org.apache.cayenne.query.SelectById;
 import org.apache.cayenne.query.SelectQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -143,11 +139,29 @@ public class StatementJobRepository {
     public Long countJobsToRetryCorebank() {
         ObjectContext context = mainServerRuntime.newContext();
         String countQuery = "select count(job) from StatementJob job "
-            + "where job.status = 'SLEEPING' and job.corebankTryAgainAt IS NOT NULL and job.corebankTryAgainAt <= :date";
+            + "where job.status = 'SLEEPING' and job.corebankTryAgainAt IS NOT NULL "
+            + "and job.corebankTryAgainAt <= :date";
         log.debug(countQuery);
 
         EJBQLQuery query = new EJBQLQuery(countQuery);
-        query.setParameter("date",LocalDateTime.now());
+        query.setParameter("date", LocalDateTime.now());
+        List<Long> result = context.performQuery(query);
+        if (result.size() == 1) {
+            return result.get(0);
+        } else {
+            return 0L;
+        }
+    }
+
+    public Long countJobsToRetrySender() {
+        ObjectContext context = mainServerRuntime.newContext();
+        String countQuery = "select count(job) from StatementJob job "
+            + "where job.status = 'SLEEPING_SENDER' and job.senderTryAgainAt IS NOT NULL "
+            + "and job.senderTryAgainAt <= :date";
+        log.debug(countQuery);
+
+        EJBQLQuery query = new EJBQLQuery(countQuery);
+        query.setParameter("date", LocalDateTime.now());
         List<Long> result = context.performQuery(query);
         if (result.size() == 1) {
             return result.get(0);
@@ -186,58 +200,33 @@ public class StatementJobRepository {
         }
     }
 
-    @Deprecated
-    public ListJobsResponse listJobsToRetryCorebank() {
+    public ResultIterator getJobsToRetrySenderIterator() throws CayenneRuntimeException {
         ObjectContext context = mainServerRuntime.newContext();
 
         SelectQuery query = new SelectQuery(StatementJob.class);
 
-        query.andQualifier(StatementJob.COREBANK_TRY_AGAIN_AT.isNotNull());
-        query.andQualifier(StatementJob.COREBANK_TRY_AGAIN_AT.lte(LocalDateTime.now()));
-        query.andQualifier(StatementJob.STATUS.eq("SLEEPING"));
+        query.andQualifier(StatementJob.SENDER_TRY_AGAIN_AT.isNotNull());
+        query.andQualifier(StatementJob.SENDER_TRY_AGAIN_AT.lt(LocalDateTime.now()));
+        query.andQualifier(StatementJob.STATUS.eq("SLEEPING_SENDER"));
 
         DataContext dataContext = (DataContext) context;
-        try {
 
-            ResultIterator it = dataContext.performIteratedQuery(query);
+        return dataContext.performIteratedQuery(query);
+    }
 
-            try {
-                while (it.hasNextRow()) {
-                    Map row = (Map) it.nextRow();
-                    log.debug(row.toString());
-                    // do something with the row...
-                }
-            } finally {
-                it.close();
-            }
-        } catch (CayenneRuntimeException e) {
-            e.printStackTrace();
+    public Map getJobsToRetrySenderNextRow(final ResultIterator iterator) throws CayenneRuntimeException {
+        if (iterator.hasNextRow()) {
+            Map row = (Map) iterator.nextRow();
+            return row;
         }
-/*
-        Iterator<StatementJob> it = jobs.iterator();
-        while (it.hasNext()) {
-            StatementJob statementJob = it.next();
-            log.info(statementJob.getAccountCode());
-            log.info(statementJob.getCorebankTryAgainAt().toString());
-
-            /*
-            RegisterJobPost jobPost = new RegisterJobPost();
-            jobPost.setAccount(statementJob.getAccountCode());
-            jobPost.setCurrency(statementJob.getAccountCurrency());
-            jobPost.setType(statementJob.getAccountType());
-            jobPost.setCustomerCode(statementJob.getCustomerCode());
-            jobPost.setRecipient(statementJob.getSendRecipient());
-            jobPost.setFrequency(statementJob.getFrequency());
-            jobPost.setDateFrom(statementJob.getProcessDateFrom());
-            jobPost.setDateTo(statementJob.getProcessDateTo());
-            jobPost.setCorebankAdapter(statementJob.getAdapterCorebank());
-            jobPost.setFormatAdapter(statementJob.getAdapterFormat());
-            jobPost.setSendAdapter(statementJob.getAdapterSend());
-            */
-
-        //JobTemplate jobTemplate = new JobTemplate(statementJob);
-        //statementJobProducer.send("" + jobTemplate.getId(), jobTemplate);
-        //}
         return null;
     }
+
+    public void getJobsToRetrySenderNextFinally(final ResultIterator iterator) throws CayenneRuntimeException {
+        log.info("getJobsToRetrySenderNextFinally close iterator");
+        if (iterator != null) {
+            iterator.close();
+        }
+    }
+
 }

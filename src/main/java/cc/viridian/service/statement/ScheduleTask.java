@@ -2,7 +2,6 @@ package cc.viridian.service.statement;
 
 import cc.viridian.provider.Exception.CorebankException;
 import cc.viridian.service.statement.service.ScheduleService;
-import cc.viridian.service.statement.service.ScheduleServiceStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,13 +22,10 @@ public class ScheduleTask {
     public void scheduleTaskUsingCronExpression() {
 
         try {
-            scheduleService.getThreadInfo();
-            //scheduleService.getStatus()
-            //if (status == ScheduleServiceStatus.IDLE) {
-
-            scheduleService.retryJobs();
-            //scheduleService.retrySender();
-            //}
+            if (scheduleService.isThreadIdle()) {
+                scheduleService.retryJobs();
+                scheduleService.retrySender();
+            }
 
         } catch (CorebankException e) {
             log.error(e.getMessage());

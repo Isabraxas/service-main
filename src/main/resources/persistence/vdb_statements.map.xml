@@ -4,24 +4,6 @@
 	 xsi:schemaLocation="http://cayenne.apache.org/schema/9/modelMap http://cayenne.apache.org/schema/9/modelMap.xsd"
 	 project-version="9">
 	<property name="defaultPackage" value="cc.viridian.service.statement.persistence"/>
-	<db-entity name="FORMAT">
-		<db-attribute name="ATTRIBUTES" type="LONGVARCHAR"/>
-		<db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
-		<db-attribute name="NAME" type="VARCHAR" length="40"/>
-		<db-attribute name="TIME_CREATE" type="TIMESTAMP"/>
-		<db-attribute name="TIME_MODIFY" type="TIMESTAMP"/>
-		<db-attribute name="USR_CREATE" type="VARCHAR" length="40"/>
-		<db-attribute name="USR_MODIFY" type="VARCHAR" length="40"/>
-	</db-entity>
-	<db-entity name="SEND">
-		<db-attribute name="ATTRIBUTES" type="LONGVARCHAR"/>
-		<db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
-		<db-attribute name="NAME" type="VARCHAR" length="40"/>
-		<db-attribute name="TIME_CREATE" type="TIMESTAMP"/>
-		<db-attribute name="TIME_MODIFY" type="TIMESTAMP"/>
-		<db-attribute name="USR_CREATE" type="VARCHAR" length="40"/>
-		<db-attribute name="USR_MODIFY" type="VARCHAR" length="40"/>
-	</db-entity>
 	<db-entity name="STATEMENT_DETAIL">
 		<db-attribute name="ACCOUNT_CODE" type="VARCHAR" length="20"/>
 		<db-attribute name="ACCOUNT_CURRENCY" type="CHAR" length="3"/>

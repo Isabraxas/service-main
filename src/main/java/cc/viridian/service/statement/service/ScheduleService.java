@@ -3,6 +3,7 @@ package cc.viridian.service.statement.service;
 import cc.viridian.provider.Exception.CorebankException;
 import cc.viridian.service.statement.repository.StatementJobProducer;
 import cc.viridian.service.statement.repository.StatementJobRepository;
+import com.sun.xml.internal.ws.client.SenderException;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,32 +73,57 @@ public class ScheduleService {
         return result;
     }
 
-    public void getThreadInfo() {
+    public boolean isThreadIdle() {
         if (status == ScheduleServiceStatus.IDLE) {
             log.info("no threads in progress, last thread was executed "
                          + diffTime(threadStartTime, LocalDateTime.now()) + " ago");
+            return true;
         } else {
             if (threadStartTime != null) {
                 log.info(
                     "thread number: " + threadNumber + " started " + diffTime(threadStartTime, LocalDateTime.now()));
             }
+            return false;
         }
     }
 
     public void retryJobs() throws CorebankException {
         if (status == ScheduleServiceStatus.IDLE) {
-            threadNumber++;
-            String threadName = "retryJob-" + threadNumber;
-            setBusy();
-
             Long count = statementJobRepository.countJobsToRetryCorebank();
             log.info("there are " + count + " records to process in retryJobs");
 
-            RetryJobsThread retryJobsThread = new RetryJobsThread(threadName);
-            retryJobsThread.setStatementJobRepository(statementJobRepository);
-            retryJobsThread.setStatementJobProducer(statementJobProducer);
-            retryJobsThread.setParent(this);
-            retryJobsThread.start();
+            if (count > 0) {
+                threadNumber++;
+                String threadName = "retryJob-" + threadNumber;
+                setBusy();
+
+                RetryJobsThread retryJobsThread = new RetryJobsThread(threadName);
+                retryJobsThread.setStatementJobRepository(statementJobRepository);
+                retryJobsThread.setStatementJobProducer(statementJobProducer);
+                retryJobsThread.setParent(this);
+                retryJobsThread.start();
+            }
+        } else {
+            log.warn("Thread is busy, can't create a new thread");
+        }
+    }
+
+    public void retrySender() throws SenderException {
+        if (status == ScheduleServiceStatus.IDLE) {
+            Long count = statementJobRepository.countJobsToRetrySender();
+            log.info("there are " + count + " records to process in retrySender");
+
+            if (count > 0L) {
+                threadNumber++;
+                String threadName = "retrySender-" + threadNumber;
+                setBusy();
+
+                RetrySenderThread retrySenderThread = new RetrySenderThread(threadName);
+                retrySenderThread.setStatementJobRepository(statementJobRepository);
+                retrySenderThread.setStatementJobProducer(statementJobProducer);
+                retrySenderThread.setParent(this);
+                retrySenderThread.start();
+            }
         } else {
             log.warn("Thread is busy, can't create a new thread");
         }
