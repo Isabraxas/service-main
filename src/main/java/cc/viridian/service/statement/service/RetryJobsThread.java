@@ -57,23 +57,15 @@ public class RetryJobsThread extends Thread {
             do {
                 row = statementJobRepository.getJobsToRetryCorebankNextRow(iterator);
                 if (row != null) {
-                    log.info("  sleep 15 secs");
                     log.info("    account " + row.get("ACCOUNT_CODE").toString());
-                    try {
-                        Long id = Long.valueOf(row.get("ID").toString());
-                        StatementJob statementJob = statementJobRepository.findById(id);
-                        statementJob.setStatus("QUEUED");
-                        statementJobRepository.updateStatementJob(statementJob);
+                    Long id = Long.valueOf(row.get("ID").toString());
+                    StatementJob statementJob = statementJobRepository.findById(id);
+                    statementJob.setStatus("QUEUED");
+                    statementJobRepository.updateStatementJob(statementJob);
 
-                        JobTemplate jobTemplate = new JobTemplate(statementJob);
-                        statementJobProducer.send("" + jobTemplate.getId(), jobTemplate);
+                    JobTemplate jobTemplate = new JobTemplate(statementJob);
+                    statementJobProducer.send("" + jobTemplate.getId(), jobTemplate);
 
-                        Thread.sleep(5 * MILLISECONDS_PER_SECOND);
-
-                        log.info("  wake up 15 secs later");
-                    } catch (InterruptedException e) {
-
-                    }
                 }
             } while (row != null);
 
