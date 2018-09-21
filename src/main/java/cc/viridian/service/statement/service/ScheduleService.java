@@ -1,8 +1,10 @@
 package cc.viridian.service.statement.service;
 
 import cc.viridian.provider.exception.CorebankException;
+import cc.viridian.service.statement.repository.SenderProducer;
 import cc.viridian.service.statement.repository.StatementJobProducer;
 import cc.viridian.service.statement.repository.StatementJobRepository;
+import cc.viridian.service.statement.repository.UpdateJobListener;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,10 @@ public class ScheduleService {
 
     private StatementJobProducer statementJobProducer;
 
+    private UpdateJobListener updateJobListener;
+
+    private SenderProducer senderProducer;
+
     private ScheduleServiceStatus status;
 
     private int threadNumber;
@@ -28,9 +34,12 @@ public class ScheduleService {
     private LocalDateTime threadEndTime;
 
     @Autowired
-    public ScheduleService(StatementJobRepository statementJobRepository, StatementJobProducer statementJobProducer) {
+    public ScheduleService(StatementJobRepository statementJobRepository, StatementJobProducer statementJobProducer
+        , UpdateJobListener updateJobListener, SenderProducer senderProducer) {
         this.statementJobRepository = statementJobRepository;
         this.statementJobProducer = statementJobProducer;
+        this.updateJobListener = updateJobListener;
+        this.senderProducer = senderProducer;
         this.status = ScheduleServiceStatus.IDLE;
         this.threadNumber = 0;
         this.threadStartTime = null;
@@ -119,7 +128,8 @@ public class ScheduleService {
 
                 RetrySenderThread retrySenderThread = new RetrySenderThread(threadName);
                 retrySenderThread.setStatementJobRepository(statementJobRepository);
-                retrySenderThread.setStatementJobProducer(statementJobProducer);
+                retrySenderThread.setUpdateJobListener(updateJobListener);
+                retrySenderThread.setSenderProducer(senderProducer);
                 retrySenderThread.setParent(this);
                 retrySenderThread.start();
             }
