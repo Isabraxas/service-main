@@ -31,7 +31,7 @@ public class UpdateJobListener {
         log.info("received UpdateJob Message: " + data.getAccount() + " "
                      + adapterType.replace("ADAPTER_", "") + " " + data.getAdapterCode());
 
-        if (adapterType == null) {
+        if (errorCode == null || adapterType == null) {
             log.error("updateJob message has invalid codes");
             log.error("errorCode: " + errorCode);
             log.error("adapterType: " + adapterType);

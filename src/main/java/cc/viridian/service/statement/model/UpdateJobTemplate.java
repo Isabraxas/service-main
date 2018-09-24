@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 @Getter
 public class UpdateJobTemplate {
     private Long id;
-    private Integer offset;
+    private Integer partition;
+    private Long offset;
     private String account;
     private String adapterType;
     private String adapterCode;

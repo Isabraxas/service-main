@@ -17,6 +17,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import java.util.Arrays;
@@ -32,9 +33,10 @@ public class RetrySenderThread extends Thread {
 
     private ScheduleService scheduleService;
 
-    private UpdateJobListener updateJobListener;
-
     private SenderProducer senderProducer;
+
+    @Autowired
+    private RetrySenderService retrySenderService;
 
 
     public RetrySenderThread(String name) {
@@ -43,10 +45,6 @@ public class RetrySenderThread extends Thread {
 
     public void setStatementJobRepository(final StatementJobRepository statementJobRepository) {
         this.statementJobRepository = statementJobRepository;
-    }
-
-    public void setUpdateJobListener(UpdateJobListener updateJobListener) {
-        this.updateJobListener = updateJobListener;
     }
 
     public void setSenderProducer(final SenderProducer senderProducer) {
@@ -82,6 +80,7 @@ public class RetrySenderThread extends Thread {
                     Long id = Long.valueOf(row.get("ID").toString());
                     StatementJob statementJob = statementJobRepository.findById(id);
                     statementJob.setStatus("QUEUED");
+                    statementJob.setSenderRetries(statementJob.getSenderRetries() + 1);
                     statementJobRepository.updateStatementJob(statementJob);
 
                     //todo: get offset,(topic and partiton) from Update Queue
@@ -91,8 +90,8 @@ public class RetrySenderThread extends Thread {
                     //todo: the offset should be a new field in UpdateJob
                     //Test fake vars
                     String topic = "dev-sender2";
-                    Integer partition = 0;
-                    Integer offset = 100;
+                    Integer partition = statementJob.getPartition();
+                    Long offset = Long.valueOf(statementJob.getSenderOffset());
 
                     SenderTemplate senderTemplate = getSendersTemplateByOffset(topic, partition, offset);
                     senderTemplate.setAttemptNumber(senderTemplate.getAttemptNumber() + 1);
@@ -112,7 +111,7 @@ public class RetrySenderThread extends Thread {
 
 
     public SenderTemplate getSendersTemplateByOffset(
-        final String topic, final Integer partition, final Integer offset) {
+        final String topic, final Integer partition, final Long offset) {
         SenderTemplate senderTemplate = new SenderTemplate();
         boolean flag = true;
 
@@ -153,7 +152,7 @@ public class RetrySenderThread extends Thread {
 
                 senderTemplate = records.iterator().next().value();
                 //todo : add consumer pause that needed a topicPartition collection
-                //consumer.pause();
+                consumer.paused();
                 break;
             }
         }

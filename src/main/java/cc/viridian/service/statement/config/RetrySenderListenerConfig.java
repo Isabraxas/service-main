@@ -17,6 +17,8 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 @Configuration
@@ -28,9 +30,8 @@ public class RetrySenderListenerConfig {
     private String bootstrapServers;
 
     @Bean
-    public Properties consumerConfigs2() {
-
-        Properties props = new Properties();
+    public Map<String, Object> consumerConfigs2() {
+        Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
@@ -41,20 +42,17 @@ public class RetrySenderListenerConfig {
     }
 
     @Bean
-    public  KafkaConsumer<String, SenderTemplate> consumerFactory2() {
+    public  ConsumerFactory<String, SenderTemplate> consumerFactory2() {
         ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
         JsonDeserializer<SenderTemplate> jsonDeserializer = new JsonDeserializer(SenderTemplate.class, objectMapper);
 
-        KafkaConsumer<String, SenderTemplate> consumer = new KafkaConsumer<>(consumerConfigs2()
-            , new StringDeserializer()
-            , jsonDeserializer
-        );
-
-        consumer.subscribe(Arrays.asList(topicStatementSender));
-
-        return consumer;
+        DefaultKafkaConsumerFactory<String, SenderTemplate> consumerFactory =
+            new DefaultKafkaConsumerFactory<>(consumerConfigs2(),
+                                              new StringDeserializer(),
+                                              jsonDeserializer
+            );
+        return consumerFactory;
     }
 
 }

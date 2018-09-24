@@ -128,7 +128,6 @@ public class ScheduleService {
 
                 RetrySenderThread retrySenderThread = new RetrySenderThread(threadName);
                 retrySenderThread.setStatementJobRepository(statementJobRepository);
-                retrySenderThread.setUpdateJobListener(updateJobListener);
                 retrySenderThread.setSenderProducer(senderProducer);
                 retrySenderThread.setParent(this);
                 retrySenderThread.start();

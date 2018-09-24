@@ -160,7 +160,7 @@ public class JobService {
             }
 
             if (updateJob.getShouldTryAgain()) {
-                statementJob.setSenderRetries(statementJob.getSenderRetries() + 1);
+                //statementJob.setSenderRetries(statementJob.getSenderRetries() + 1);
 
                 LocalDateTime minutesToWait = calculateWhenToWakeUpSender(statementJob.getSenderRetries());
 
@@ -170,6 +170,9 @@ public class JobService {
                 } else {
                     statementJob.setStatus(StatusCode.WITH_ERROR.name());
                 }
+
+                statementJob.setPartition(updateJob.getPartition());
+                statementJob.setSenderOffset(Integer.valueOf(updateJob.getOffset().toString()));
             }
         }
 
