@@ -43,7 +43,7 @@ public class RetrySenderService {
             }
 
             if (records.iterator().hasNext() && records.iterator().next().offset() == offset) {
-                ConsumerRecord<String, SenderTemplate> recordST= records.iterator().next();
+                ConsumerRecord<String, SenderTemplate> recordST = records.iterator().next();
                 log.info("offset = " + recordST.offset()
                              + ", key = " + recordST.key()
                              + ", attempt = " + recordST.value().getAttemptNumber()
@@ -52,12 +52,12 @@ public class RetrySenderService {
                              + ", sender = " + recordST.value().getSendAdapter()
                 );
 
-                senderTemplate = records.iterator().next().value();
+                senderTemplate = recordST.value();
                 consumer.paused();
                 break;
             }
         }
-
+        consumer.close();
         return senderTemplate;
     }
 }
