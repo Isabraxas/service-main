@@ -22,7 +22,6 @@ public class RetrySenderThread extends Thread {
 
     private SenderProducer senderProducer;
 
-    @Autowired
     private RetrySenderService retrySenderService;
 
 
@@ -36,6 +35,10 @@ public class RetrySenderThread extends Thread {
 
     public void setSenderProducer(final SenderProducer senderProducer) {
         this.senderProducer = senderProducer;
+    }
+
+    public void setRetrySenderService(final RetrySenderService retrySenderService) {
+        this.retrySenderService = retrySenderService;
     }
 
     public void setParent(final ScheduleService scheduleService) {

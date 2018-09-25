@@ -27,6 +27,8 @@ public class ScheduleService {
 
     private SenderProducer senderProducer;
 
+    private RetrySenderService retrySenderService;
+
     private ScheduleServiceStatus status;
 
     private int threadNumber;
@@ -35,11 +37,13 @@ public class ScheduleService {
 
     @Autowired
     public ScheduleService(StatementJobRepository statementJobRepository, StatementJobProducer statementJobProducer,
-                           UpdateJobListener updateJobListener, SenderProducer senderProducer) {
+                           UpdateJobListener updateJobListener, SenderProducer senderProducer,
+                           RetrySenderService retrySenderService) {
         this.statementJobRepository = statementJobRepository;
         this.statementJobProducer = statementJobProducer;
         this.updateJobListener = updateJobListener;
         this.senderProducer = senderProducer;
+        this.retrySenderService = retrySenderService;
         this.status = ScheduleServiceStatus.IDLE;
         this.threadNumber = 0;
         this.threadStartTime = null;
@@ -129,6 +133,7 @@ public class ScheduleService {
                 RetrySenderThread retrySenderThread = new RetrySenderThread(threadName);
                 retrySenderThread.setStatementJobRepository(statementJobRepository);
                 retrySenderThread.setSenderProducer(senderProducer);
+                retrySenderThread.setRetrySenderService(retrySenderService);
                 retrySenderThread.setParent(this);
                 retrySenderThread.start();
             }
