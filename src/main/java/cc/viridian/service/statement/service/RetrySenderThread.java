@@ -1,12 +1,9 @@
 package cc.viridian.service.statement.service;
 
-import cc.viridian.service.statement.model.JobTemplate;
 import cc.viridian.service.statement.model.SenderTemplate;
 import cc.viridian.service.statement.persistence.StatementJob;
 import cc.viridian.service.statement.repository.SenderProducer;
-import cc.viridian.service.statement.repository.StatementJobProducer;
 import cc.viridian.service.statement.repository.StatementJobRepository;
-import cc.viridian.service.statement.repository.UpdateJobListener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
@@ -145,13 +142,13 @@ public class RetrySenderThread extends Thread {
             }
 
             if (records.iterator().hasNext() && records.iterator().next().offset() == offset) {
-                System.out.printf("offset = %d, key = %s, value = %s%n"
-                    , records.iterator().next().offset()
-                    , records.iterator().next().key()
-                    , records.iterator().next().value());
+                log.info("offset = %d, key = %s, value = %s%n",
+                         records.iterator().next().offset(),
+                         records.iterator().next().key(),
+                         records.iterator().next().value()
+                );
 
                 senderTemplate = records.iterator().next().value();
-                //todo : add consumer pause that needed a topicPartition collection
                 consumer.paused();
                 break;
             }

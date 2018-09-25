@@ -34,8 +34,8 @@ public class ScheduleService {
     private LocalDateTime threadEndTime;
 
     @Autowired
-    public ScheduleService(StatementJobRepository statementJobRepository, StatementJobProducer statementJobProducer
-        , UpdateJobListener updateJobListener, SenderProducer senderProducer) {
+    public ScheduleService(StatementJobRepository statementJobRepository, StatementJobProducer statementJobProducer,
+                           UpdateJobListener updateJobListener, SenderProducer senderProducer) {
         this.statementJobRepository = statementJobRepository;
         this.statementJobProducer = statementJobProducer;
         this.updateJobListener = updateJobListener;
