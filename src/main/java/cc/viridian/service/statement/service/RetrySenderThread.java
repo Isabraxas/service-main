@@ -142,7 +142,7 @@ public class RetrySenderThread extends Thread {
             }
 
             if (records.iterator().hasNext() && records.iterator().next().offset() == offset) {
-                log.info("offset = %d, key = %s, value = %s%n",
+                System.out.printf("offset = %d, key = %s, value = %s%n",
                          records.iterator().next().offset(),
                          records.iterator().next().key(),
                          records.iterator().next().value()
