@@ -46,7 +46,7 @@ public class UpdateJobListener {
 
         log.info("topic:" + headers.get("kafka_receivedTopic")
                      + " offset: " + headers.get("kafka_offset")
-                     + "key: " + headers.get("kafka_receivedMessageKey")
+                     + " key: " + headers.get("kafka_receivedMessageKey")
                      + " partition: " + headers.get("kafka_receivedPartitionId"));
 
         if (adapterType.equals(ResponseAdapterCode.ADAPTER_COREBANK.name())) {

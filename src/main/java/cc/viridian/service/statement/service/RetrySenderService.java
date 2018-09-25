@@ -44,7 +44,10 @@ public class RetrySenderService {
             if (records.iterator().hasNext() && records.iterator().next().offset() == offset) {
                 log.info("offset = " + records.iterator().next().offset()
                              + ", key = " + records.iterator().next().key()
-                             + ", value = " + records.iterator().next().value()
+                             + ", attempt = " + records.iterator().next().value().getAttemptNumber()
+                             + ", account = " + records.iterator().next().value().getAccount()
+                             + ", formater = " + records.iterator().next().value().getFormatAdapter()
+                             + ", sender = " + records.iterator().next().value().getSendAdapter()
                 );
 
                 senderTemplate = records.iterator().next().value();
