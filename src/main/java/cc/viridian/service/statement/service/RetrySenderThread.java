@@ -7,7 +7,6 @@ import cc.viridian.service.statement.repository.StatementJobRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.ResultIterator;
-import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Map;
 
 
@@ -73,12 +72,6 @@ public class RetrySenderThread extends Thread {
                     statementJob.setSenderRetries(statementJob.getSenderRetries() + 1);
                     statementJobRepository.updateStatementJob(statementJob);
 
-                    //todo: get offset,(topic and partiton) from Update Queue
-                    //todo: get SenderTemplate throght of service and her fuction
-                    //todo: send SenderTemplate instead a JobTemplate
-                    //todo: increment the AttemptNumber
-                    //todo: the offset should be a new field in UpdateJob
-                    //Test fake vars
                     String topic = "dev-sender2";
                     Integer partition = statementJob.getPartition();
                     Long offset = Long.valueOf(statementJob.getSenderOffset());

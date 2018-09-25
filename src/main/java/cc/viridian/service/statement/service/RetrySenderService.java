@@ -3,6 +3,7 @@ package cc.viridian.service.statement.service;
 import cc.viridian.service.statement.model.SenderTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +43,13 @@ public class RetrySenderService {
             }
 
             if (records.iterator().hasNext() && records.iterator().next().offset() == offset) {
-                log.info("offset = " + records.iterator().next().offset()
-                             + ", key = " + records.iterator().next().key()
-                             + ", value = " + records.iterator().next().value()
+                ConsumerRecord<String, SenderTemplate> recordST= records.iterator().next();
+                log.info("offset = " + recordST.offset()
+                             + ", key = " + recordST.key()
+                             + ", attempt = " + recordST.value().getAttemptNumber()
+                             + ", account = " + recordST.value().getAccount()
+                             + ", formater = " + recordST.value().getFormatAdapter()
+                             + ", sender = " + recordST.value().getSendAdapter()
                 );
 
                 senderTemplate = records.iterator().next().value();

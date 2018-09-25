@@ -160,7 +160,6 @@ public class JobService {
             }
 
             if (updateJob.getShouldTryAgain()) {
-                statementJob.setSenderRetries(statementJob.getSenderRetries() + 1);
 
                 LocalDateTime minutesToWait = calculateWhenToWakeUpSender(statementJob.getSenderRetries());
 

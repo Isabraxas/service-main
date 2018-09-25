@@ -4,7 +4,6 @@ import cc.viridian.provider.exception.CorebankException;
 import cc.viridian.service.statement.repository.SenderProducer;
 import cc.viridian.service.statement.repository.StatementJobProducer;
 import cc.viridian.service.statement.repository.StatementJobRepository;
-import cc.viridian.service.statement.repository.UpdateJobListener;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,6 @@ public class ScheduleService {
 
     private StatementJobProducer statementJobProducer;
 
-    private UpdateJobListener updateJobListener;
-
     private SenderProducer senderProducer;
 
     private RetrySenderService retrySenderService;
@@ -36,12 +33,12 @@ public class ScheduleService {
     private LocalDateTime threadEndTime;
 
     @Autowired
-    public ScheduleService(StatementJobRepository statementJobRepository, StatementJobProducer statementJobProducer,
-                           UpdateJobListener updateJobListener, SenderProducer senderProducer,
+    public ScheduleService(StatementJobRepository statementJobRepository,
+                           StatementJobProducer statementJobProducer,
+                           SenderProducer senderProducer,
                            RetrySenderService retrySenderService) {
         this.statementJobRepository = statementJobRepository;
         this.statementJobProducer = statementJobProducer;
-        this.updateJobListener = updateJobListener;
         this.senderProducer = senderProducer;
         this.retrySenderService = retrySenderService;
         this.status = ScheduleServiceStatus.IDLE;
