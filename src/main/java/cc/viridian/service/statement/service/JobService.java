@@ -170,6 +170,9 @@ public class JobService {
                 } else {
                     statementJob.setStatus(StatusCode.WITH_ERROR.name());
                 }
+
+                statementJob.setPartition(updateJob.getPartition());
+                statementJob.setSenderOffset(Integer.valueOf(updateJob.getOffset().toString()));
             }
         }
 

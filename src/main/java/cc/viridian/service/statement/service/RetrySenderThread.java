@@ -1,13 +1,15 @@
 package cc.viridian.service.statement.service;
 
-import cc.viridian.service.statement.model.JobTemplate;
+import cc.viridian.service.statement.model.SenderTemplate;
 import cc.viridian.service.statement.persistence.StatementJob;
-import cc.viridian.service.statement.repository.StatementJobProducer;
+import cc.viridian.service.statement.repository.SenderProducer;
 import cc.viridian.service.statement.repository.StatementJobRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.ResultIterator;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Map;
+
 
 @Slf4j
 public class RetrySenderThread extends Thread {
@@ -18,7 +20,11 @@ public class RetrySenderThread extends Thread {
 
     private ScheduleService scheduleService;
 
-    private StatementJobProducer statementJobProducer;
+    private SenderProducer senderProducer;
+
+    @Autowired
+    private RetrySenderService retrySenderService;
+
 
     public RetrySenderThread(String name) {
         super(name);
@@ -28,8 +34,8 @@ public class RetrySenderThread extends Thread {
         this.statementJobRepository = statementJobRepository;
     }
 
-    public void setStatementJobProducer(final StatementJobProducer statementJobProducer) {
-        this.statementJobProducer = statementJobProducer;
+    public void setSenderProducer(final SenderProducer senderProducer) {
+        this.senderProducer = senderProducer;
     }
 
     public void setParent(final ScheduleService scheduleService) {
@@ -61,13 +67,23 @@ public class RetrySenderThread extends Thread {
                     Long id = Long.valueOf(row.get("ID").toString());
                     StatementJob statementJob = statementJobRepository.findById(id);
                     statementJob.setStatus("QUEUED");
+                    statementJob.setSenderRetries(statementJob.getSenderRetries() + 1);
                     statementJobRepository.updateStatementJob(statementJob);
 
+                    //todo: get offset,(topic and partiton) from Update Queue
+                    //todo: get SenderTemplate throght of service and her fuction
                     //todo: send SenderTemplate instead a JobTemplate
                     //todo: increment the AttemptNumber
                     //todo: the offset should be a new field in UpdateJob
-                    JobTemplate jobTemplate = new JobTemplate(statementJob);
-                    statementJobProducer.send("" + jobTemplate.getId(), jobTemplate);
+                    //Test fake vars
+                    String topic = "dev-sender2";
+                    Integer partition = statementJob.getPartition();
+                    Long offset = Long.valueOf(statementJob.getSenderOffset());
+
+                    SenderTemplate senderTemplate = retrySenderService
+                        .getSendersTemplateByOffset(topic, partition, offset);
+                    senderTemplate.setAttemptNumber(senderTemplate.getAttemptNumber() + 1);
+                    senderProducer.send("" + senderTemplate.getId(), senderTemplate);
                 }
             } while (row != null);
 
@@ -80,5 +96,6 @@ public class RetrySenderThread extends Thread {
             scheduleService.setIdle();
         }
     }
+
 
 }

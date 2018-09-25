@@ -32,11 +32,13 @@ public abstract class _StatementJob extends CayenneDataObject {
     public static final Property<String> FORMATTER_ERROR_CODE = Property.create("formatterErrorCode", String.class);
     public static final Property<String> FORMATTER_ERROR_DESC = Property.create("formatterErrorDesc", String.class);
     public static final Property<String> FREQUENCY = Property.create("frequency", String.class);
+    public static final Property<Integer> PARTITION = Property.create("partition", Integer.class);
     public static final Property<LocalDate> PROCESS_DATE_FROM = Property.create("processDateFrom", LocalDate.class);
     public static final Property<LocalDate> PROCESS_DATE_TO = Property.create("processDateTo", LocalDate.class);
     public static final Property<String> SEND_RECIPIENT = Property.create("sendRecipient", String.class);
     public static final Property<String> SENDER_ERROR_CODE = Property.create("senderErrorCode", String.class);
     public static final Property<String> SENDER_ERROR_DESC = Property.create("senderErrorDesc", String.class);
+    public static final Property<Integer> SENDER_OFFSET = Property.create("senderOffset", Integer.class);
     public static final Property<Integer> SENDER_RETRIES = Property.create("senderRetries", Integer.class);
     public static final Property<LocalDateTime> SENDER_TRY_AGAIN_AT = Property.create("senderTryAgainAt", LocalDateTime.class);
     public static final Property<String> STATUS = Property.create("status", String.class);
@@ -143,6 +145,13 @@ public abstract class _StatementJob extends CayenneDataObject {
         return (String)readProperty("frequency");
     }
 
+    public void setPartition(Integer partition) {
+        writeProperty("partition", partition);
+    }
+    public Integer getPartition() {
+        return (Integer)readProperty("partition");
+    }
+
     public void setProcessDateFrom(LocalDate processDateFrom) {
         writeProperty("processDateFrom", processDateFrom);
     }
@@ -176,6 +185,13 @@ public abstract class _StatementJob extends CayenneDataObject {
     }
     public String getSenderErrorDesc() {
         return (String)readProperty("senderErrorDesc");
+    }
+
+    public void setSenderOffset(Integer senderOffset) {
+        writeProperty("senderOffset", senderOffset);
+    }
+    public Integer getSenderOffset() {
+        return (Integer)readProperty("senderOffset");
     }
 
     public void setSenderRetries(int senderRetries) {

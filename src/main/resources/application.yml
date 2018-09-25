@@ -21,3 +21,23 @@
 #  url: jdbc:postgresql://postgres.lab.viridian.cc:5432/viridian
 #  user: viridian
 #  password: sesamo
+
+server:
+  port: 7020
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+
+topic:
+  statement:
+    jobs: dev-jobs2
+    update: dev-updates2
+    sender: dev-sender2
+
+
+database:
+  jdbc-driver: org.postgresql.Driver
+  url: jdbc:postgresql://postgres.lab.viridian.cc:5432/updatekafka
+  user: viridian
+  password: sesamo
