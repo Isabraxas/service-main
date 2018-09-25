@@ -69,7 +69,6 @@ public class RetrySenderThread extends Thread {
                     Long id = Long.valueOf(row.get("ID").toString());
                     StatementJob statementJob = statementJobRepository.findById(id);
                     statementJob.setStatus("QUEUED");
-                    statementJob.setSenderRetries(statementJob.getSenderRetries() + 1);
                     statementJobRepository.updateStatementJob(statementJob);
 
                     String topic = "dev-sender2";

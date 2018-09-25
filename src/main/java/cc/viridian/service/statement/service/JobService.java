@@ -48,8 +48,8 @@ public class JobService {
 
     @Autowired
     public JobService(StatementService statementService,
-                       StatementJobProducer statementJobProducer,
-                       StatementJobRepository statementJobRepository) {
+                      StatementJobProducer statementJobProducer,
+                      StatementJobRepository statementJobRepository) {
         this.statementJobRepository = statementJobRepository;
         this.statementService = statementService;
         this.statementJobProducer = statementJobProducer;
@@ -175,6 +175,10 @@ public class JobService {
             }
         }
 
+        if (statementJob.getSenderTryAgainAt() != null) {
+            statementJob.setSenderRetries(statementJob.getSenderRetries() + 1);
+        }
+
         //now, update the record in the database
         statementJobRepository.updateStatementJob(statementJob);
 
@@ -183,6 +187,7 @@ public class JobService {
 
     /**
      * Obtains a list of Accounts who match the "MONTHLY" criteria and then registers and process the list to kafka
+     *
      * @return a Map Object containing the dates from and to, and the number of records processed
      */
     public Map<String, Object> processMonthlyAccounts() {
@@ -213,7 +218,8 @@ public class JobService {
         res.put("recordsProcessed", records);
         res.put("dateFrom", LocalDate.of(nowDate.getYear(), calculatePreviousMonth(nowDate), 1));
         res.put("dateTo",
-                LocalDate.of(nowDate.getYear(), calculatePreviousMonth(nowDate), calculateLastDayOfMonth(nowDate)));
+                LocalDate.of(nowDate.getYear(), calculatePreviousMonth(nowDate), calculateLastDayOfMonth(nowDate))
+        );
         return res;
     }
 

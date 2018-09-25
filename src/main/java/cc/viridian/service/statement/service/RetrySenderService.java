@@ -29,34 +29,36 @@ public class RetrySenderService {
         Consumer<String, SenderTemplate> consumer = consumerSenderFactory.createConsumer();
         consumer.subscribe(Arrays.asList(topic));
 
-        boolean flag = true;
+        ConsumerRecords<String, SenderTemplate> records;
+        final ConsumerRecord<String, SenderTemplate>[] recordST = new ConsumerRecord[]{null};
         while (true) {
-            ConsumerRecords<String, SenderTemplate> records = consumer.poll(100);
-            if (flag) {
-
-                TopicPartition topicPartition = new TopicPartition(topic, partition);
-                consumer.seek(
-                    topicPartition,
-                    offset
-                );
-                flag = false;
-            }
-
-            if (records.iterator().hasNext() && records.iterator().next().offset() == offset) {
-                ConsumerRecord<String, SenderTemplate> recordST = records.iterator().next();
-                log.info("offset = " + recordST.offset()
-                             + ", key = " + recordST.key()
-                             + ", attempt = " + recordST.value().getAttemptNumber()
-                             + ", account = " + recordST.value().getAccount()
-                             + ", formater = " + recordST.value().getFormatAdapter()
-                             + ", sender = " + recordST.value().getSendAdapter()
-                );
-
-                senderTemplate = recordST.value();
-                consumer.paused();
+            records = consumer.poll(100);
+            if (records != null) {
                 break;
             }
         }
+
+        TopicPartition topicPartition = new TopicPartition(topic, partition);
+        consumer.seek(
+            topicPartition,
+            offset
+        );
+
+        records.iterator().forEachRemaining(consumerRecord -> {
+            if (consumerRecord.offset() == offset) {
+                recordST[0] = consumerRecord;
+            }
+        });
+
+        log.info("offset = " + recordST[0].offset()
+                     + ", key = " + recordST[0].key()
+                     + ", attempt = " + recordST[0].value().getAttemptNumber()
+                     + ", account = " + recordST[0].value().getAccount()
+                     + ", formater = " + recordST[0].value().getFormatAdapter()
+                     + ", sender = " + recordST[0].value().getSendAdapter()
+        );
+
+        senderTemplate = recordST[0].value();
         consumer.close();
         return senderTemplate;
     }
