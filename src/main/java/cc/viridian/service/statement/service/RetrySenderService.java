@@ -14,18 +14,18 @@ import java.util.Arrays;
 @Service
 public class RetrySenderService {
     @Autowired
-    private ConsumerFactory<String, SenderTemplate> consumerFactory2;
+    private ConsumerFactory<String, SenderTemplate> consumerSenderFactory;
 
     @Autowired
-    public RetrySenderService(ConsumerFactory<String, SenderTemplate> consumerFactory2) {
-        this.consumerFactory2 = consumerFactory2;
+    public RetrySenderService(ConsumerFactory<String, SenderTemplate> consumerSenderFactory) {
+        this.consumerSenderFactory = consumerSenderFactory;
     }
 
     public SenderTemplate getSendersTemplateByOffset(
         final String topic, final Integer partition, final Long offset) {
 
         SenderTemplate senderTemplate = new SenderTemplate();
-        Consumer<String, SenderTemplate> consumer = consumerFactory2.createConsumer();
+        Consumer<String, SenderTemplate> consumer = consumerSenderFactory.createConsumer();
         consumer.subscribe(Arrays.asList(topic));
 
         boolean flag = true;
@@ -42,10 +42,9 @@ public class RetrySenderService {
             }
 
             if (records.iterator().hasNext() && records.iterator().next().offset() == offset) {
-                log.info("offset = %d, key = %s, value = %s%n",
-                         records.iterator().next().offset(),
-                         records.iterator().next().key(),
-                         records.iterator().next().value()
+                log.info("offset = " + records.iterator().next().offset()
+                             + ", key = " + records.iterator().next().key()
+                             + ", value = " + records.iterator().next().value()
                 );
 
                 senderTemplate = records.iterator().next().value();
@@ -53,7 +52,7 @@ public class RetrySenderService {
                 break;
             }
         }
-        System.out.println(senderTemplate);
+
         return senderTemplate;
     }
 }

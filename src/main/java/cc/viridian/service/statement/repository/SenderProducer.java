@@ -22,8 +22,11 @@ public class SenderProducer {
     }
 
     public void send(final String messageKey, final SenderTemplate data) {
-        log.debug("sending statement for account  " + data.getStatement().getHeader().getAccountCode()
-                      + " with key " + messageKey);
+        log.debug("sending statement for account  "
+                      + data.getStatement().getHeader().getAccountCode()
+                      + ", attempt " + data.getAttemptNumber()
+                      + " with key " + messageKey
+        );
 
         Message<SenderTemplate> message = MessageBuilder
             .withPayload(data)

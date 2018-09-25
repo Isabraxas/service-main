@@ -28,7 +28,7 @@ public class RetrySenderListenerConfig {
     public Map<String, Object> consumerConfigs2() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "retry-sender");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
@@ -37,7 +37,7 @@ public class RetrySenderListenerConfig {
     }
 
     @Bean
-    public  ConsumerFactory<String, SenderTemplate> consumerFactory2() {
+    public  ConsumerFactory<String, SenderTemplate> consumerSenderFactory() {
         ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         JsonDeserializer<SenderTemplate> jsonDeserializer = new JsonDeserializer(SenderTemplate.class, objectMapper);
