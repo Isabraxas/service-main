@@ -42,18 +42,13 @@ public class RetrySenderService {
                     offset
                 );
                 flag = false;
-                for (ConsumerRecord<String, SenderTemplate> record : records) {
-                    System.out.printf("iter = %d, offset = %d, key = %s, value = %s%n", i, record.offset(), record.key(), record.value());
-                }
             }
             System.out.println(i++);
 
-           /* if(records.iterator().hasNext() && records.iterator().next().offset() == offset){
-                for (ConsumerRecord<String, SenderTemplate> record : records)
-                    System.out.printf("iter = %d, offset2 = %d, key = %s, value = %s%n", i, record.offset(), record.key(), record.value());
+          if(records.iterator().hasNext() && records.iterator().next().offset() == offset){
                 break;
-            }*/
-        }while (records != null);
+            }
+        }while (flag == false);
 
         records.iterator().forEachRemaining(consumerRecord -> {
             if (consumerRecord.offset() == offset) {
