@@ -29,37 +29,35 @@ public class RetrySenderService {
         Consumer<String, SenderTemplate> consumer = consumerSenderFactory.createConsumer();
         consumer.subscribe(Arrays.asList(topic));
 
-        ConsumerRecords<String, SenderTemplate> records;
-        final ConsumerRecord<String, SenderTemplate>[] recordST = new ConsumerRecord[]{null};
+        ConsumerRecord<String, SenderTemplate> recordST;
+        boolean flag = true;
         while (true) {
-            records = consumer.poll(100);
-            if (records != null) {
+            ConsumerRecords<String, SenderTemplate> records = consumer.poll(300);
+            if (flag) {
+
+                TopicPartition topicPartition = new TopicPartition(topic, partition);
+                consumer.seek(
+                    topicPartition,
+                    offset
+                );
+                flag = false;
+            }
+            if (records.iterator().hasNext() && records.iterator().next().offset() == offset) {
+                recordST = records.iterator().next();
                 break;
             }
         }
-
-        TopicPartition topicPartition = new TopicPartition(topic, partition);
-        consumer.seek(
-            topicPartition,
-            offset
+        log.info("offset = " + recordST.offset()
+                     + ", key = " + recordST.key()
+                     + ", attempt = " + recordST.value().getAttemptNumber()
+                     + ", account = " + recordST.value().getAccount()
+                     + ", formater = " + recordST.value().getFormatAdapter()
+                     + ", sender = " + recordST.value().getSendAdapter()
         );
 
-        records.iterator().forEachRemaining(consumerRecord -> {
-            if (consumerRecord.offset() == offset) {
-                recordST[0] = consumerRecord;
-            }
-        });
-
-        log.info("offset = " + recordST[0].offset()
-                     + ", key = " + recordST[0].key()
-                     + ", attempt = " + recordST[0].value().getAttemptNumber()
-                     + ", account = " + recordST[0].value().getAccount()
-                     + ", formater = " + recordST[0].value().getFormatAdapter()
-                     + ", sender = " + recordST[0].value().getSendAdapter()
-        );
-
-        senderTemplate = recordST[0].value();
+        senderTemplate = recordST.value();
         consumer.close();
         return senderTemplate;
+
     }
 }
