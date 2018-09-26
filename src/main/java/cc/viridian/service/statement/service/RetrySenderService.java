@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
@@ -25,39 +26,51 @@ public class RetrySenderService {
     public SenderTemplate getSendersTemplateByOffset(
         final String topic, final Integer partition, final Long offset) {
 
-        SenderTemplate senderTemplate = new SenderTemplate();
+        AtomicReference<SenderTemplate> senderTemplate = new AtomicReference<>(new SenderTemplate());
         Consumer<String, SenderTemplate> consumer = consumerSenderFactory.createConsumer();
         consumer.subscribe(Arrays.asList(topic));
 
-        ConsumerRecord<String, SenderTemplate> recordST;
+        ConsumerRecords<String, SenderTemplate> records = null;
+        TopicPartition topicPartition = new TopicPartition(topic, partition);
+        int i = 0;
         boolean flag = true;
-        while (true) {
-            ConsumerRecords<String, SenderTemplate> records = consumer.poll(300);
-            if (flag) {
-
-                TopicPartition topicPartition = new TopicPartition(topic, partition);
+        do {
+            records = consumer.poll(100);
+            if(flag) {
                 consumer.seek(
                     topicPartition,
                     offset
                 );
                 flag = false;
+                for (ConsumerRecord<String, SenderTemplate> record : records) {
+                    System.out.printf("iter = %d, offset = %d, key = %s, value = %s%n", i, record.offset(), record.key(), record.value());
+                }
             }
-            if (records.iterator().hasNext() && records.iterator().next().offset() == offset) {
-                recordST = records.iterator().next();
-                break;
-            }
-        }
-        log.info("offset = " + recordST.offset()
-                     + ", key = " + recordST.key()
-                     + ", attempt = " + recordST.value().getAttemptNumber()
-                     + ", account = " + recordST.value().getAccount()
-                     + ", formater = " + recordST.value().getFormatAdapter()
-                     + ", sender = " + recordST.value().getSendAdapter()
-        );
+            System.out.println(i++);
 
-        senderTemplate = recordST.value();
+           /* if(records.iterator().hasNext() && records.iterator().next().offset() == offset){
+                for (ConsumerRecord<String, SenderTemplate> record : records)
+                    System.out.printf("iter = %d, offset2 = %d, key = %s, value = %s%n", i, record.offset(), record.key(), record.value());
+                break;
+            }*/
+        }while (records != null);
+
+        records.iterator().forEachRemaining(consumerRecord -> {
+            if (consumerRecord.offset() == offset) {
+                log.info("offset = " + consumerRecord.offset()
+                             + ", key = " + consumerRecord.key()
+                             + ", attempt = " + consumerRecord.value().getAttemptNumber()
+                             + ", account = " + consumerRecord.value().getAccount()
+                             + ", formater = " + consumerRecord.value().getFormatAdapter()
+                             + ", sender = " + consumerRecord.value().getSendAdapter()
+                );
+                senderTemplate.set(consumerRecord.value());
+            }
+        });
+
         consumer.close();
-        return senderTemplate;
+        return senderTemplate.get();
 
     }
+
 }
