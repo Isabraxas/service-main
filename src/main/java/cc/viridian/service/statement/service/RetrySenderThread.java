@@ -42,7 +42,7 @@ public class RetrySenderThread extends Thread {
         this.retrySenderService = retrySenderService;
     }
 
-    public void setTopicConfigServer(String topicConfigServer) {
+    public void setTopicConfigServer(final String topicConfigServer) {
         this.topicConfigServer = topicConfigServer;
     }
 
