@@ -7,6 +7,7 @@ import cc.viridian.service.statement.repository.StatementJobRepository;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -15,6 +16,10 @@ import java.time.temporal.ChronoUnit;
 @NoArgsConstructor
 @Service
 public class ScheduleService {
+
+    @Value("${topic.statement.sender}")
+    private String topicStatementSender;
+
     static final int SECONDS_PER_MINUTE = 60;
     static final int SECONDS_PER_HOUR = 3600;
 
@@ -131,6 +136,7 @@ public class ScheduleService {
                 retrySenderThread.setStatementJobRepository(statementJobRepository);
                 retrySenderThread.setSenderProducer(senderProducer);
                 retrySenderThread.setRetrySenderService(retrySenderService);
+                retrySenderThread.setTopicConfigServer(topicStatementSender);
                 retrySenderThread.setParent(this);
                 retrySenderThread.start();
             }

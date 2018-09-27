@@ -23,6 +23,8 @@ public class RetrySenderThread extends Thread {
 
     private RetrySenderService retrySenderService;
 
+    private String topicConfigServer;
+
 
     public RetrySenderThread(String name) {
         super(name);
@@ -40,6 +42,10 @@ public class RetrySenderThread extends Thread {
         this.retrySenderService = retrySenderService;
     }
 
+    public void setTopicConfigServer(String topicConfigServer) {
+        this.topicConfigServer = topicConfigServer;
+    }
+
     public void setParent(final ScheduleService scheduleService) {
         this.scheduleService = scheduleService;
     }
@@ -52,6 +58,11 @@ public class RetrySenderThread extends Thread {
         }
         if (statementJobRepository == null) {
             log.error("statementJobRepository is null");
+            scheduleService.setIdle();
+            return;
+        }
+        if (topicConfigServer == null) {
+            log.error("topicConfigServer is null");
             scheduleService.setIdle();
             return;
         }
@@ -71,7 +82,7 @@ public class RetrySenderThread extends Thread {
                     statementJob.setStatus("QUEUED");
                     statementJobRepository.updateStatementJob(statementJob);
 
-                    String topic = "dev-sender2";
+                    String topic = topicConfigServer;
                     Integer partition = statementJob.getPartition();
                     Long offset = Long.valueOf(statementJob.getSenderOffset());
 
