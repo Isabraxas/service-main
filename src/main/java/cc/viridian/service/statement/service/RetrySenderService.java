@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
@@ -26,46 +25,45 @@ public class RetrySenderService {
     public SenderTemplate getSendersTemplateByOffset(
         final String topic, final Integer partition, final Long offset) {
 
-        AtomicReference<SenderTemplate> senderTemplate = new AtomicReference<>(new SenderTemplate());
+        SenderTemplate senderTemplate = new SenderTemplate();
         Consumer<String, SenderTemplate> consumer = consumerSenderFactory.createConsumer();
         consumer.subscribe(Arrays.asList(topic));
 
         ConsumerRecords<String, SenderTemplate> records = null;
+        ConsumerRecord<String, SenderTemplate> recordST;
         TopicPartition topicPartition = new TopicPartition(topic, partition);
-        int i = 0;
+
         boolean flag = true;
         do {
             records = consumer.poll(100);
-            if(flag) {
+
+            if (records.iterator().hasNext()) {
+                recordST = records.iterator().next();
+
+                if (recordST.offset() == offset) {
+                    senderTemplate = recordST.value();
+
+                    log.info("offset = " + recordST.offset()
+                                 + ", key = " + recordST.key()
+                                 + ", attempt = " + recordST.value().getAttemptNumber()
+                                 + ", account = " + recordST.value().getAccount()
+                                 + ", formater = " + recordST.value().getFormatAdapter()
+                                 + ", sender = " + recordST.value().getSendAdapter()
+                    );
+
+                    consumer.close();
+                    return senderTemplate;
+                }
+            }
+
+            if (flag) {
                 consumer.seek(
                     topicPartition,
                     offset
                 );
                 flag = false;
             }
-            System.out.println(i++);
 
-          if(records.iterator().hasNext() && records.iterator().next().offset() == offset){
-                break;
-            }
-        }while (flag == false);
-
-        records.iterator().forEachRemaining(consumerRecord -> {
-            if (consumerRecord.offset() == offset) {
-                log.info("offset = " + consumerRecord.offset()
-                             + ", key = " + consumerRecord.key()
-                             + ", attempt = " + consumerRecord.value().getAttemptNumber()
-                             + ", account = " + consumerRecord.value().getAccount()
-                             + ", formater = " + consumerRecord.value().getFormatAdapter()
-                             + ", sender = " + consumerRecord.value().getSendAdapter()
-                );
-                senderTemplate.set(consumerRecord.value());
-            }
-        });
-
-        consumer.close();
-        return senderTemplate.get();
-
+        } while (true);
     }
-
 }
