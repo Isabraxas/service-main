@@ -5,5 +5,5 @@ spring:
     active: default
   cloud:
     config:
-      uri: http://desarrollo.viridian.cc:7000
+      uri: http://localhost:7000
       profile: default
